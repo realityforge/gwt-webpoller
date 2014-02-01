@@ -1,5 +1,6 @@
 package org.realityforge.gwt.webpoller.client;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import javax.annotation.Nonnull;
@@ -21,7 +22,7 @@ public abstract class WebPoller
 
   public static WebPoller newWebPoller( final boolean longPoll )
   {
-    if ( null == g_factory )
+    if ( null == g_factory && GWT.isClient() )
     {
       register( new Html5WebPoller.Factory() );
     }

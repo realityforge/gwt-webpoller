@@ -4,18 +4,18 @@ import com.google.gwt.event.shared.EventHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.WebPoller;
-import org.realityforge.gwt.webpoller.client.event.OpenEvent.Handler;
+import org.realityforge.gwt.webpoller.client.event.StartEvent.Handler;
 
 /**
- * Event fired when the web poller connects for the first time.
+ * Event fired when the web poller starts polling.
  */
-public class OpenEvent
+public class StartEvent
   extends WebPollerEvent<Handler>
 {
   public interface Handler
     extends EventHandler
   {
-    void onOpenEvent( @Nonnull OpenEvent event );
+    void onStartEvent( @Nonnull StartEvent event );
   }
 
   private static final GwtEvent.Type<Handler> TYPE = new Type<>();
@@ -25,7 +25,7 @@ public class OpenEvent
     return TYPE;
   }
 
-  public OpenEvent( @Nonnull final WebPoller webPoller )
+  public StartEvent( @Nonnull final WebPoller webPoller )
   {
     super( webPoller );
   }
@@ -33,12 +33,12 @@ public class OpenEvent
   @Override
   public GwtEvent.Type<Handler> getAssociatedType()
   {
-    return OpenEvent.getType();
+    return StartEvent.getType();
   }
 
   @Override
   protected void dispatch( @Nonnull final Handler handler )
   {
-    handler.onOpenEvent( this );
+    handler.onStartEvent( this );
   }
 }

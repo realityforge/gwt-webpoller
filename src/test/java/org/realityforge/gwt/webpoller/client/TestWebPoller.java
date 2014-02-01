@@ -24,12 +24,13 @@ final class TestWebPoller
   }
 
   @Override
-  public void connect( @Nonnull final String server )
+  public void start()
   {
+
   }
 
   @Override
-  public void close()
+  public void stop()
   {
   }
 }

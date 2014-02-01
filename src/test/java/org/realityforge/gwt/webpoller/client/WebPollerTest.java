@@ -4,10 +4,10 @@ import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import org.mockito.Mockito;
 import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
-import org.realityforge.gwt.webpoller.client.event.CloseEvent;
+import org.realityforge.gwt.webpoller.client.event.StartEvent;
+import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
-import org.realityforge.gwt.webpoller.client.event.OpenEvent;
 import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -33,24 +33,24 @@ public class WebPollerTest
     final TestWebPoller webSocket = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
 
     {
-      final OpenEvent.Handler handler = mock( OpenEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addOpenHandler( handler );
-      webSocket.onOpen();
-      verify( handler, only() ).onOpenEvent( refEq( new OpenEvent( webSocket ), "source" ) );
+      final StartEvent.Handler handler = mock( StartEvent.Handler.class );
+      final HandlerRegistration registration = webSocket.addStartHandler( handler );
+      webSocket.onStart();
+      verify( handler, only() ).onStartEvent( refEq( new StartEvent( webSocket ), "source" ) );
       registration.removeHandler();
-      webSocket.onOpen();
-      verify( handler, atMost( 1 ) ).onOpenEvent( any( OpenEvent.class ) );
+      webSocket.onStart();
+      verify( handler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
     }
 
     {
-      final CloseEvent.Handler handler = mock( CloseEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addCloseHandler( handler );
-      webSocket.onClose();
-      final CloseEvent expected = new CloseEvent( webSocket );
-      verify( handler, only() ).onCloseEvent( refEq( expected, "source" ) );
+      final StopEvent.Handler handler = mock( StopEvent.Handler.class );
+      final HandlerRegistration registration = webSocket.addStopHandler( handler );
+      webSocket.onStop();
+      final StopEvent expected = new StopEvent( webSocket );
+      verify( handler, only() ).onStopEvent( refEq( expected, "source" ) );
       registration.removeHandler();
-      webSocket.onClose();
-      verify( handler, atMost( 1 ) ).onCloseEvent( any( CloseEvent.class ) );
+      webSocket.onStop();
+      verify( handler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
     }
 
     {

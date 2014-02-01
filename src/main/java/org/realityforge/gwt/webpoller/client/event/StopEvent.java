@@ -3,18 +3,18 @@ package org.realityforge.gwt.webpoller.client.event;
 import com.google.gwt.event.shared.EventHandler;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.WebPoller;
-import org.realityforge.gwt.webpoller.client.event.CloseEvent.Handler;
+import org.realityforge.gwt.webpoller.client.event.StopEvent.Handler;
 
 /**
- * Event fired when the web poller is closed.
+ * Event fired when the web poller is stopped.
  */
-public class CloseEvent
+public class StopEvent
   extends WebPollerEvent<Handler>
 {
   public interface Handler
     extends EventHandler
   {
-    void onCloseEvent( @Nonnull CloseEvent event );
+    void onStopEvent( @Nonnull StopEvent event );
   }
 
   private static final Type<Handler> TYPE = new Type<>();
@@ -24,7 +24,7 @@ public class CloseEvent
     return TYPE;
   }
 
-  public CloseEvent( @Nonnull final WebPoller webPoller )
+  public StopEvent( @Nonnull final WebPoller webPoller )
   {
     super( webPoller );
   }
@@ -32,12 +32,12 @@ public class CloseEvent
   @Override
   public Type<Handler> getAssociatedType()
   {
-    return CloseEvent.getType();
+    return StopEvent.getType();
   }
 
   @Override
   protected void dispatch( @Nonnull final Handler handler )
   {
-    handler.onCloseEvent( this );
+    handler.onStopEvent( this );
   }
 }

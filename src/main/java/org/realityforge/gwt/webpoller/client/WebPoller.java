@@ -5,10 +5,10 @@ import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import javax.annotation.Nonnull;
-import org.realityforge.gwt.webpoller.client.event.CloseEvent;
+import org.realityforge.gwt.webpoller.client.event.StartEvent;
+import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
-import org.realityforge.gwt.webpoller.client.event.OpenEvent;
 import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
 
 public abstract class WebPoller
@@ -81,20 +81,20 @@ public abstract class WebPoller
     return _eventBus;
   }
 
-  public abstract void connect( @Nonnull String url );
+  public abstract void start();
 
-  public abstract void close();
+  public abstract void stop();
 
   @Nonnull
-  public final HandlerRegistration addOpenHandler( @Nonnull OpenEvent.Handler handler )
+  public final HandlerRegistration addStartHandler( @Nonnull StartEvent.Handler handler )
   {
-    return getEventBus().addHandler( OpenEvent.getType(), handler );
+    return getEventBus().addHandler( StartEvent.getType(), handler );
   }
 
   @Nonnull
-  public final HandlerRegistration addCloseHandler( @Nonnull CloseEvent.Handler handler )
+  public final HandlerRegistration addStopHandler( @Nonnull StopEvent.Handler handler )
   {
-    return getEventBus().addHandler( CloseEvent.getType(), handler );
+    return getEventBus().addHandler( StopEvent.getType(), handler );
   }
 
   @Nonnull
@@ -110,19 +110,19 @@ public abstract class WebPoller
   }
 
   /**
-   * Fire a Connected event.
+   * Fire a Start event.
    */
-  protected final void onOpen()
+  protected final void onStart()
   {
-    _eventBus.fireEventFromSource( new OpenEvent( this ), this );
+    _eventBus.fireEventFromSource( new StartEvent( this ), this );
   }
 
   /**
-   * Fire a Close event.
+   * Fire a Stop event.
    */
-  protected final void onClose()
+  protected final void onStop()
   {
-    _eventBus.fireEventFromSource( new CloseEvent( this ), this );
+    _eventBus.fireEventFromSource( new StopEvent( this ), this );
   }
 
   /**

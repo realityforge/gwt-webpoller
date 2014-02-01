@@ -10,16 +10,17 @@ final class TestWebPoller
   static class Factory
     implements WebPoller.Factory
   {
+    @Nonnull
     @Override
-    public WebPoller newWebPoller( final boolean longPoll )
+    public WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
     {
-      return new TestWebPoller( new SimpleEventBus() );
+      return new TestWebPoller( new SimpleEventBus(), requestFactory, longPoll );
     }
   }
 
-  TestWebPoller( final EventBus eventBus )
+  TestWebPoller( final EventBus eventBus, @Nonnull final RequestFactory requestFactory, final boolean longPoll )
   {
-    super( eventBus );
+    super( eventBus, requestFactory, longPoll );
   }
 
   @Override

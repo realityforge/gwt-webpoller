@@ -1,6 +1,7 @@
 package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import javax.annotation.Nonnull;
@@ -12,21 +13,30 @@ import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
 
 public abstract class WebPoller
 {
+  public interface RequestFactory
+  {
+    @Nonnull
+    Request newRequest();
+  }
+
   public interface Factory
   {
-    WebPoller newWebPoller( boolean longPoll );
+    @Nonnull
+    WebPoller newWebPoller( @Nonnull RequestFactory requestFactory, boolean longPoll );
   }
 
   private static Factory g_factory;
   private final EventBus _eventBus;
+  private final RequestFactory _requestFactory;
+  private final boolean _longPoll;
 
-  public static WebPoller newWebPoller( final boolean longPoll )
+  public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
   {
     if ( null == g_factory && GWT.isClient() )
     {
       register( new Html5WebPoller.Factory() );
     }
-    return g_factory.newWebPoller( longPoll );
+    return ( null != g_factory ) ? g_factory.newWebPoller( requestFactory, longPoll ) : null;
   }
 
   public static void register( @Nonnull final Factory factory )
@@ -47,9 +57,24 @@ public abstract class WebPoller
     }
   }
 
-  public WebPoller( final EventBus eventBus )
+  protected WebPoller( @Nonnull final EventBus eventBus,
+                       @Nonnull final RequestFactory requestFactory,
+                       final boolean longPoll )
   {
     _eventBus = eventBus;
+    _requestFactory = requestFactory;
+    _longPoll = longPoll;
+  }
+
+  protected final RequestFactory getRequestFactory()
+  {
+    return _requestFactory;
+  }
+
+  protected final boolean isLongPoll()
+  {
+    return _longPoll;
+  }
 
   protected final EventBus getEventBus()
   {

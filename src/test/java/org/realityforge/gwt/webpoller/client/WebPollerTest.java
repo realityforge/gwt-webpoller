@@ -3,6 +3,7 @@ package org.realityforge.gwt.webpoller.client;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import org.mockito.Mockito;
+import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
 import org.realityforge.gwt.webpoller.client.event.CloseEvent;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
@@ -16,19 +17,20 @@ public class WebPollerTest
   @Test
   public void registryTest()
   {
-    assertNull( WebPoller.newWebPoller( true ) );
+    final RequestFactory requestFactory = mock( RequestFactory.class );
+    assertNull( WebPoller.newWebPoller( requestFactory, true ) );
     final TestWebPoller.Factory factory = new TestWebPoller.Factory();
     WebPoller.register( factory );
-    assertNotNull( WebPoller.newWebPoller( true ) );
+    assertNotNull( WebPoller.newWebPoller( requestFactory, true ) );
     assertTrue( WebPoller.deregister( factory ) );
-    assertNull( WebPoller.newWebPoller( true ) );
+    assertNull( WebPoller.newWebPoller( requestFactory, true ) );
     assertFalse( WebPoller.deregister( factory ) );
   }
 
   @Test
   public void handlerInteractions()
   {
-    final TestWebPoller webSocket = new TestWebPoller( new SimpleEventBus() );
+    final TestWebPoller webSocket = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
 
     {
       final OpenEvent.Handler handler = mock( OpenEvent.Handler.class );

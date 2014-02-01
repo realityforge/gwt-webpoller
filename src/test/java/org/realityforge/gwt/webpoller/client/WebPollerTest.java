@@ -74,4 +74,107 @@ public class WebPollerTest
       verify( handler, atMost( 1 ) ).onErrorEvent( Mockito.<ErrorEvent>anyObject() );
     }
   }
+
+  @Test
+  public void basicWorkflow()
+  {
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
+
+    final StartEvent.Handler startHandler = mock( StartEvent.Handler.class );
+    webPoller.addStartHandler( startHandler );
+    final StopEvent.Handler stopHandler = mock( StopEvent.Handler.class );
+    webPoller.addStopHandler( stopHandler );
+    final MessageEvent.Handler messageHandler = mock( MessageEvent.Handler.class );
+    webPoller.addMessageHandler( messageHandler );
+    final ErrorEvent.Handler errorHandler = mock( ErrorEvent.Handler.class );
+    webPoller.addErrorHandler( errorHandler );
+
+    // Test start
+    {
+      verify( startHandler, never() ).onStartEvent( any( StartEvent.class ) );
+      assertFalse( webPoller.isActive() );
+
+      webPoller.start();
+      assertTrue( webPoller.isActive() );
+      verify( startHandler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
+    }
+
+    // Try start again...
+    {
+      try
+      {
+        webPoller.start();
+        fail( "Expected to fail to start" );
+      }
+      catch ( final IllegalStateException ise )
+      {
+        assertTrue( webPoller.isActive() );
+        verify( startHandler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
+      }
+    }
+
+    // Test stop
+    {
+      verify( stopHandler, never() ).onStopEvent( any( StopEvent.class ) );
+      assertTrue( webPoller.isActive() );
+
+      webPoller.stop();
+      assertFalse( webPoller.isActive() );
+      verify( stopHandler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
+    }
+
+    // Try to stop again...
+    {
+      try
+      {
+        webPoller.stop();
+        fail( "Expected to fail to stop" );
+      }
+      catch ( final IllegalStateException ise )
+      {
+        assertFalse( webPoller.isActive() );
+        verify( stopHandler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
+      }
+    }
+
+    // Restart so can test data...
+    {
+      webPoller.start();
+      assertTrue( webPoller.isActive() );
+      verify( startHandler, atMost( 2 ) ).onStartEvent( any( StartEvent.class ) );
+    }
+
+    //Does data flow through
+    {
+      final String data = "Blah!";
+      webPoller.onMessage( data );
+      verify( messageHandler, atMost( 1 ) ).onMessageEvent( refEq( new MessageEvent( webPoller, data ), "source" ) );
+    }
+
+    //Error state handling
+    {
+      assertFalse( webPoller.inError() );
+      webPoller.onError();
+      verify( errorHandler, atMost( 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
+      assertTrue( webPoller.inError() );
+
+      //A few more errors but not enough to close the poller
+
+      final int errorCountThreshold = 5; //WebPoller.ERROR_COUNT_THRESHOLD;
+      for ( int i = 1; i < errorCountThreshold; i++ )
+      {
+        webPoller.onError();
+      }
+      verify( errorHandler, atMost( errorCountThreshold ) ).onErrorEvent( any( ErrorEvent.class ) );
+      assertTrue( webPoller.inError() );
+      assertTrue( webPoller.isActive() );
+
+      // This should result in shutdown of poller
+      webPoller.onError();
+      assertFalse( webPoller.isActive() );
+      assertFalse( webPoller.inError() );
+      verify( errorHandler, atMost( errorCountThreshold + 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
+      verify( stopHandler, atMost( 2 ) ).onStopEvent( any( StopEvent.class ) );
+    }
+  }
 }

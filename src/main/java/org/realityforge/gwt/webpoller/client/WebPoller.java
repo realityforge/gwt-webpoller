@@ -50,6 +50,10 @@ public abstract class WebPoller
   public WebPoller( final EventBus eventBus )
   {
     _eventBus = eventBus;
+
+  protected final EventBus getEventBus()
+  {
+    return _eventBus;
   }
 
   public abstract void connect( @Nonnull String url );
@@ -59,25 +63,25 @@ public abstract class WebPoller
   @Nonnull
   public final HandlerRegistration addOpenHandler( @Nonnull OpenEvent.Handler handler )
   {
-    return _eventBus.addHandler( OpenEvent.getType(), handler );
+    return getEventBus().addHandler( OpenEvent.getType(), handler );
   }
 
   @Nonnull
   public final HandlerRegistration addCloseHandler( @Nonnull CloseEvent.Handler handler )
   {
-    return _eventBus.addHandler( CloseEvent.getType(), handler );
+    return getEventBus().addHandler( CloseEvent.getType(), handler );
   }
 
   @Nonnull
   public final HandlerRegistration addMessageHandler( @Nonnull MessageEvent.Handler handler )
   {
-    return _eventBus.addHandler( MessageEvent.getType(), handler );
+    return getEventBus().addHandler( MessageEvent.getType(), handler );
   }
 
   @Nonnull
   public final HandlerRegistration addErrorHandler( @Nonnull ErrorEvent.Handler handler )
   {
-    return _eventBus.addHandler( ErrorEvent.getType(), handler );
+    return getEventBus().addHandler( ErrorEvent.getType(), handler );
   }
 
   /**

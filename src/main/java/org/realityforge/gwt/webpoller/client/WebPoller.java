@@ -29,6 +29,7 @@ public abstract class WebPoller
   private final EventBus _eventBus;
   private final RequestFactory _requestFactory;
   private final boolean _longPoll;
+  private boolean _active;
 
   public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
   {
@@ -66,6 +67,44 @@ public abstract class WebPoller
     _longPoll = longPoll;
   }
 
+  /**
+   * @return true if the poller is active.
+   */
+  public boolean isActive()
+  {
+    return _active;
+  }
+
+  /**
+   * Start polling.
+   *
+   * @throws IllegalStateException if the poller is already active.
+   */
+  public final void start()
+    throws IllegalStateException
+  {
+    if ( isActive() )
+    {
+      throw new IllegalStateException( "Start invoked on active poller" );
+    }
+    doStart();
+  }
+
+  /**
+   * Stop polling.
+   *
+   * @throws IllegalStateException if the poller is not active.
+   */
+  public final void stop()
+    throws IllegalStateException
+  {
+    if ( !isActive() )
+    {
+      throw new IllegalStateException( "Stop invoked on inactive poller" );
+    }
+    doStop();
+  }
+
   protected final RequestFactory getRequestFactory()
   {
     return _requestFactory;
@@ -81,9 +120,27 @@ public abstract class WebPoller
     return _eventBus;
   }
 
-  public abstract void start();
+  /**
+   * Sub-classes should override this method to provide functionality.
+   */
+  protected void doStop()
+  {
+    _active = false;
+    _errorCount = 0;
+    onStop();
+  }
 
-  public abstract void stop();
+  /**
+   * Sub-classes should override this method to provide functionality.
+   */
+  protected void doStart()
+  {
+    _active = true;
+    onStart();
+  }
+
+  /**
+   */
 
   @Nonnull
   public final HandlerRegistration addStartHandler( @Nonnull StartEvent.Handler handler )

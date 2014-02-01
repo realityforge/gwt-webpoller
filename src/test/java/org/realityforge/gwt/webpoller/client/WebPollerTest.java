@@ -30,47 +30,47 @@ public class WebPollerTest
   @Test
   public void handlerInteractions()
   {
-    final TestWebPoller webSocket = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
 
     {
       final StartEvent.Handler handler = mock( StartEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addStartHandler( handler );
-      webSocket.onStart();
-      verify( handler, only() ).onStartEvent( refEq( new StartEvent( webSocket ), "source" ) );
+      final HandlerRegistration registration = webPoller.addStartHandler( handler );
+      webPoller.onStart();
+      verify( handler, only() ).onStartEvent( refEq( new StartEvent( webPoller ), "source" ) );
       registration.removeHandler();
-      webSocket.onStart();
+      webPoller.onStart();
       verify( handler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
     }
 
     {
       final StopEvent.Handler handler = mock( StopEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addStopHandler( handler );
-      webSocket.onStop();
-      final StopEvent expected = new StopEvent( webSocket );
+      final HandlerRegistration registration = webPoller.addStopHandler( handler );
+      webPoller.onStop();
+      final StopEvent expected = new StopEvent( webPoller );
       verify( handler, only() ).onStopEvent( refEq( expected, "source" ) );
       registration.removeHandler();
-      webSocket.onStop();
+      webPoller.onStop();
       verify( handler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
     }
 
     {
       final MessageEvent.Handler handler = mock( MessageEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addMessageHandler( handler );
-      webSocket.onMessage( "Blah" );
-      final MessageEvent expected = new MessageEvent( webSocket, "Blah" );
+      final HandlerRegistration registration = webPoller.addMessageHandler( handler );
+      webPoller.onMessage( "Blah" );
+      final MessageEvent expected = new MessageEvent( webPoller, "Blah" );
       verify( handler, only() ).onMessageEvent( refEq( expected, "source" ) );
       registration.removeHandler();
-      webSocket.onMessage( "Blah" );
+      webPoller.onMessage( "Blah" );
       verify( handler, atMost( 1 ) ).onMessageEvent( any( MessageEvent.class ) );
     }
 
     {
       final ErrorEvent.Handler handler = mock( ErrorEvent.Handler.class );
-      final HandlerRegistration registration = webSocket.addErrorHandler( handler );
-      webSocket.onError();
+      final HandlerRegistration registration = webPoller.addErrorHandler( handler );
+      webPoller.onError();
       verify( handler, only() ).onErrorEvent( any( ErrorEvent.class ) );
       registration.removeHandler();
-      webSocket.onError();
+      webPoller.onError();
       verify( handler, atMost( 1 ) ).onErrorEvent( Mockito.<ErrorEvent>anyObject() );
     }
   }

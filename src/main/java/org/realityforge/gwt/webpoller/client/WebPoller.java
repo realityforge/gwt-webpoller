@@ -13,6 +13,11 @@ import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
 
 public abstract class WebPoller
 {
+  /**
+   * The number of error before the poller is marked as failed.
+   */
+  private static final int ERROR_COUNT_THRESHOLD = 5;
+
   public interface RequestFactory
   {
     @Nonnull
@@ -30,6 +35,7 @@ public abstract class WebPoller
   private final RequestFactory _requestFactory;
   private final boolean _longPoll;
   private boolean _active;
+  private int _errorCount;
 
   public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
   {
@@ -73,6 +79,14 @@ public abstract class WebPoller
   public boolean isActive()
   {
     return _active;
+  }
+
+  /**
+   * @return false if stopped, otherwise true if the the last poll resulted in error.
+   */
+  public boolean inError()
+  {
+    return _errorCount > 0;
   }
 
   /**
@@ -140,7 +154,12 @@ public abstract class WebPoller
   }
 
   /**
+   * Invoked after a successful poll, regardless of whether data was received or not.
    */
+  protected final void resetErrorState()
+  {
+    _errorCount = 0;
+  }
 
   @Nonnull
   public final HandlerRegistration addStartHandler( @Nonnull StartEvent.Handler handler )
@@ -188,13 +207,20 @@ public abstract class WebPoller
   protected final void onMessage( final String data )
   {
     _eventBus.fireEventFromSource( new MessageEvent( this, data ), this );
+    resetErrorState();
   }
 
   /**
    * Fire an Error event.
+   * If the number of successive errors reaches a threshold then shut-down the poller.
    */
   protected final void onError()
   {
     _eventBus.fireEventFromSource( new ErrorEvent( this ), this );
+    _errorCount++;
+    if ( _errorCount > ERROR_COUNT_THRESHOLD )
+    {
+      doStop();
+    }
   }
 }

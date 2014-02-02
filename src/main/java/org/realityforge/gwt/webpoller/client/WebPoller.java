@@ -5,6 +5,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
@@ -266,9 +267,10 @@ public abstract class WebPoller
   /**
    * Fire a Message event.
    */
-  protected final void onMessage( final String data )
+  protected final void onMessage( @Nonnull final Map<String,String> context,
+                                  @Nonnull final String data )
   {
-    _eventBus.fireEventFromSource( new MessageEvent( this, data ), this );
+    _eventBus.fireEventFromSource( new MessageEvent( this, context, data ), this );
     resetErrorState();
   }
 

@@ -1,6 +1,8 @@
 package org.realityforge.gwt.webpoller.client.event;
 
 import com.google.gwt.event.shared.EventHandler;
+import java.util.Collections;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import org.realityforge.gwt.webpoller.client.WebPoller;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent.Handler;
@@ -21,12 +23,22 @@ public class MessageEvent
     return TYPE;
   }
 
+  private final Map<String,String> _context;
   private final String _data;
 
-  public MessageEvent( @Nonnull final WebPoller webPoller, @Nonnull final String data )
+  public MessageEvent( @Nonnull final WebPoller webPoller,
+                       @Nonnull final Map<String,String> context,
+                       @Nonnull final String data )
   {
     super( webPoller );
+    _context = Collections.unmodifiableMap( context );
     _data = data;
+  }
+
+  @Nonnull
+  public Map<String, String> getContext()
+  {
+    return _context;
   }
 
   @Nonnull

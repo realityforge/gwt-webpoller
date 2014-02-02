@@ -2,6 +2,7 @@ package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
+import java.util.HashMap;
 import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
@@ -55,11 +56,12 @@ public class WebPollerTest
     {
       final MessageEvent.Handler handler = mock( MessageEvent.Handler.class );
       final HandlerRegistration registration = webPoller.addMessageHandler( handler );
-      webPoller.onMessage( "Blah" );
-      final MessageEvent expected = new MessageEvent( webPoller, "Blah" );
+      final HashMap<String, String> context = new HashMap<>();
+      webPoller.onMessage( context, "Blah" );
+      final MessageEvent expected = new MessageEvent( webPoller, context, "Blah" );
       verify( handler, only() ).onMessageEvent( refEq( expected, "source" ) );
       registration.removeHandler();
-      webPoller.onMessage( "Blah" );
+      webPoller.onMessage( context, "Blah" );
       verify( handler, atMost( 1 ) ).onMessageEvent( any( MessageEvent.class ) );
     }
 
@@ -226,8 +228,9 @@ public class WebPollerTest
     //Does data flow through
     {
       final String data = "Blah!";
-      webPoller.onMessage( data );
-      verify( messageHandler, atMost( 1 ) ).onMessageEvent( refEq( new MessageEvent( webPoller, data ), "source" ) );
+      final HashMap<String, String> context = new HashMap<>();
+      webPoller.onMessage( context, data );
+      verify( messageHandler, atMost( 1 ) ).onMessageEvent( refEq( new MessageEvent( webPoller, context, data ), "source" ) );
     }
 
     //Error state handling

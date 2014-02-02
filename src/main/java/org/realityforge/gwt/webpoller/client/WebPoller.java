@@ -9,7 +9,7 @@ import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
 import org.realityforge.gwt.webpoller.client.event.StartEvent;
 import org.realityforge.gwt.webpoller.client.event.StopEvent;
-import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
+import org.realityforge.gwt.webpoller.client.TimerBasedWebPoller;
 
 public abstract class WebPoller
 {
@@ -47,7 +47,7 @@ public abstract class WebPoller
   {
     if ( null == g_factory && GWT.isClient() )
     {
-      register( new Html5WebPoller.Factory() );
+      register( new TimerBasedWebPoller.Factory() );
     }
     return ( null != g_factory ) ? g_factory.newWebPoller( requestFactory ) : null;
   }

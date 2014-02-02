@@ -15,6 +15,10 @@ import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
 public abstract class WebPoller
 {
   /**
+   * The duration between polls when not using long polling.
+   */
+  private static final int DEFAULT_POLL_DURATION = 2000;
+  /**
    * The number of error before the poller is marked as failed.
    */
   private static final int DEFAULT_ERROR_COUNT_THRESHOLD = 5;
@@ -37,6 +41,7 @@ public abstract class WebPoller
   private boolean _longPoll;
   private boolean _active;
   private int _errorCount;
+  private int _pollDuration = DEFAULT_POLL_DURATION;
   /**
    * The number of errors before the poller is marked as failed.
    */
@@ -146,6 +151,20 @@ public abstract class WebPoller
       throw new IllegalStateException( "Attempt to invoke setErrorCountThreshold when poller active" );
     }
     _errorCountThreshold = errorCountThreshold;
+  }
+
+  public final int getPollDuration()
+  {
+    return _pollDuration;
+  }
+
+  public final void setPollDuration( final int pollDuration )
+  {
+    if ( isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke setPollDuration when poller active" );
+    }
+    _pollDuration = pollDuration;
   }
 
   public final boolean isLongPoll()

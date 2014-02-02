@@ -119,6 +119,9 @@ public class WebPollerTest
 
     final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
 
+    assertEquals( webPoller.getErrorCountThreshold(), 5 );
+    assertEquals( webPoller.getPollDuration(), 2000 );
+
     final StartEvent.Handler startHandler = mock( StartEvent.Handler.class );
     webPoller.addStartHandler( startHandler );
     final StopEvent.Handler stopHandler = mock( StopEvent.Handler.class );
@@ -134,6 +137,7 @@ public class WebPollerTest
       assertFalse( webPoller.isActive() );
       assertFalse( webPoller.isLongPoll() );
 
+      webPoller.setPollDuration( 50 );
       webPoller.setErrorCountThreshold( errorCountThreshold );
       webPoller.setLongPoll( true );
       assertTrue( webPoller.isLongPoll() );
@@ -156,6 +160,16 @@ public class WebPollerTest
       {
         webPoller.setErrorCountThreshold( errorCountThreshold );
         fail( "Should not be able to setErrorCountThreshold on started webPoller" );
+      }
+      catch ( final IllegalStateException e )
+      {
+        //Ignore
+      }
+
+      try
+      {
+        webPoller.setPollDuration( 50 );
+        fail( "Should not be able to setPollDuration on started webPoller" );
       }
       catch ( final IllegalStateException e )
       {

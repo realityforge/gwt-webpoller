@@ -14,8 +14,6 @@ import org.realityforge.gwt.webpoller.client.WebPoller;
 public class Html5WebPoller
   extends WebPoller
 {
-  private static final int POLL_DURATION = 2000;
-
   private Timer _timer;
   private Request _request;
 
@@ -74,7 +72,7 @@ public class Html5WebPoller
       }
     };
 
-    _timer.scheduleRepeating( POLL_DURATION );
+    _timer.scheduleRepeating( getPollDuration() );
   }
 
   private void stopTimer()

@@ -115,6 +115,8 @@ public class WebPollerTest
   @Test
   public void basicWorkflow()
   {
+    final int errorCountThreshold = 7;
+
     final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
 
     final StartEvent.Handler startHandler = mock( StartEvent.Handler.class );
@@ -132,6 +134,7 @@ public class WebPollerTest
       assertFalse( webPoller.isActive() );
       assertFalse( webPoller.isLongPoll() );
 
+      webPoller.setErrorCountThreshold( errorCountThreshold );
       webPoller.setLongPoll( true );
       assertTrue( webPoller.isLongPoll() );
 
@@ -149,6 +152,15 @@ public class WebPollerTest
         //Ignore
       }
 
+      try
+      {
+        webPoller.setErrorCountThreshold( errorCountThreshold );
+        fail( "Should not be able to setErrorCountThreshold on started webPoller" );
+      }
+      catch ( final IllegalStateException e )
+      {
+        //Ignore
+      }
     }
 
     // Try start again...
@@ -211,8 +223,6 @@ public class WebPollerTest
       assertTrue( webPoller.inError() );
 
       //A few more errors but not enough to close the poller
-
-      final int errorCountThreshold = 5; //WebPoller.ERROR_COUNT_THRESHOLD;
       for ( int i = 1; i < errorCountThreshold; i++ )
       {
         webPoller.onError();

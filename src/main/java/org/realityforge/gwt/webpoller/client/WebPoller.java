@@ -17,7 +17,7 @@ public abstract class WebPoller
   /**
    * The number of error before the poller is marked as failed.
    */
-  private static final int ERROR_COUNT_THRESHOLD = 5;
+  private static final int DEFAULT_ERROR_COUNT_THRESHOLD = 5;
 
   public interface RequestFactory
   {
@@ -37,6 +37,10 @@ public abstract class WebPoller
   private boolean _longPoll;
   private boolean _active;
   private int _errorCount;
+  /**
+   * The number of errors before the poller is marked as failed.
+   */
+  private int _errorCountThreshold = DEFAULT_ERROR_COUNT_THRESHOLD;
   private boolean _inPoll;
 
   public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
@@ -122,6 +126,26 @@ public abstract class WebPoller
   protected final RequestFactory getRequestFactory()
   {
     return _requestFactory;
+  }
+
+  /**
+   * @return the number of errors before poller is stopped.
+   */
+  public final int getErrorCountThreshold()
+  {
+    return _errorCountThreshold;
+  }
+
+  /**
+   * Set the number of errors before poller is stopped.
+   */
+  public void setErrorCountThreshold( final int errorCountThreshold )
+  {
+    if ( isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke setErrorCountThreshold when poller active" );
+    }
+    _errorCountThreshold = errorCountThreshold;
   }
 
   public final boolean isLongPoll()
@@ -237,7 +261,7 @@ public abstract class WebPoller
   {
     _eventBus.fireEventFromSource( new ErrorEvent( this ), this );
     _errorCount++;
-    if ( _errorCount > ERROR_COUNT_THRESHOLD )
+    if ( _errorCount > _errorCountThreshold )
     {
       doStop();
     }

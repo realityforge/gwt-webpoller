@@ -18,8 +18,16 @@ final class TestWebPoller
     }
   }
 
+  int _pollCount;
+
   TestWebPoller( final EventBus eventBus, @Nonnull final RequestFactory requestFactory )
   {
     super( eventBus, requestFactory );
+  }
+
+  @Override
+  protected void doPoll()
+  {
+    _pollCount++;
   }
 }

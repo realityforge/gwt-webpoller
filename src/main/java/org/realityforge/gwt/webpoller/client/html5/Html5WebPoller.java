@@ -17,7 +17,6 @@ public class Html5WebPoller
   private static final int POLL_DURATION = 2000;
 
   private Timer _timer;
-  private boolean _inPoll;
   private Request _request;
 
   public static class Factory
@@ -46,7 +45,6 @@ public class Html5WebPoller
       _request.cancel();
       _request = null;
     }
-    _inPoll = false;
     super.doStop();
   }
 
@@ -88,14 +86,9 @@ public class Html5WebPoller
     }
   }
 
-  private void poll()
+  @Override
+  protected void doPoll()
   {
-    if ( _inPoll )
-    {
-      return;
-    }
-
-    _inPoll = true;
     final RequestBuilder requestBuilder =
       getRequestFactory().getRequestBuilder( new RequestCallback()
       {
@@ -105,7 +98,7 @@ public class Html5WebPoller
           final String data = response.getText();
           if ( 0 == data.length() )
           {
-            resetErrorState();
+            onEmptyPollResult();
           }
           else
           {
@@ -132,13 +125,9 @@ public class Html5WebPoller
     }
   }
 
-  private void pollReturned()
+  protected void pollReturned()
   {
-    _inPoll = false;
     _request = null;
-    if ( isActive() && isLongPoll() )
-    {
-      poll();
-    }
+    super.pollReturned();
   }
 }

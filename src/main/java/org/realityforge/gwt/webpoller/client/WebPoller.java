@@ -37,6 +37,7 @@ public abstract class WebPoller
   private boolean _longPoll;
   private boolean _active;
   private int _errorCount;
+  private boolean _inPoll;
 
   public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
   {
@@ -148,6 +149,7 @@ public abstract class WebPoller
    */
   protected void doStop()
   {
+    _inPoll = false;
     _active = false;
     _errorCount = 0;
     onStop();
@@ -163,9 +165,17 @@ public abstract class WebPoller
   }
 
   /**
+   * Invoked after a successful poll returning no data.
+   */
+  protected final void onEmptyPollResult()
+  {
+    resetErrorState();
+  }
+
+  /**
    * Invoked after a successful poll, regardless of whether data was received or not.
    */
-  protected final void resetErrorState()
+  private void resetErrorState()
   {
     _errorCount = 0;
   }
@@ -232,4 +242,42 @@ public abstract class WebPoller
       doStop();
     }
   }
+
+  /**
+   * @return true if a poll request is outstanding.
+   */
+  protected final boolean isInPoll()
+  {
+    return _inPoll;
+  }
+
+  /**
+   * This should be invoked when the poll has completed.
+   * It may be overriden by sub-classes to perform other cleanup.
+   */
+  protected void pollReturned()
+  {
+    _inPoll = false;
+    if ( isActive() && isLongPoll() )
+    {
+      poll();
+    }
+  }
+
+  /**
+   * Orchestrate the polling.
+   */
+  protected final void poll()
+  {
+    if ( !isInPoll() )
+    {
+      _inPoll = true;
+      doPoll();
+    }
+  }
+
+  /**
+   * Sub-classes should override to perform actual polling.
+   */
+  protected abstract void doPoll();
 }

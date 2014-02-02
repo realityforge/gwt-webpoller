@@ -76,6 +76,43 @@ public class WebPollerTest
   }
 
   @Test
+  public void polling()
+  {
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
+    webPoller.setLongPoll( false );
+    webPoller.start();
+
+    assertFalse( webPoller.isInPoll() );
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 1 );
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 1 );
+    assertTrue( webPoller.isInPoll() );
+    webPoller.pollReturned();
+    assertEquals( webPoller._pollCount, 1 );
+    assertFalse( webPoller.isInPoll() );
+
+    webPoller.stop();
+
+    // Now test long polling
+
+    webPoller.setLongPoll( true );
+    webPoller.start();
+
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 2 );
+    webPoller.pollReturned();
+    assertEquals( webPoller._pollCount, 3 );
+    assertTrue( webPoller.isInPoll() );
+    webPoller.stop();
+
+    //poll returned after stop should result in no more polls
+    webPoller.pollReturned();
+    assertEquals( webPoller._pollCount, 3 );
+    assertFalse( webPoller.isInPoll() );
+  }
+
+  @Test
   public void basicWorkflow()
   {
     final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
@@ -105,7 +142,7 @@ public class WebPollerTest
       try
       {
         webPoller.setLongPoll( false );
-        fail("Should not be able to setLongPoll on started webPoller");
+        fail( "Should not be able to setLongPoll on started webPoller" );
       }
       catch ( final IllegalStateException e )
       {

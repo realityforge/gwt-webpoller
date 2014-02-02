@@ -267,7 +267,7 @@ public abstract class WebPoller
   /**
    * Fire a Message event.
    */
-  protected final void onMessage( @Nonnull final Map<String,String> context,
+  protected final void onMessage( @Nonnull final Map<String, String> context,
                                   @Nonnull final String data )
   {
     _eventBus.fireEventFromSource( new MessageEvent( this, context, data ), this );

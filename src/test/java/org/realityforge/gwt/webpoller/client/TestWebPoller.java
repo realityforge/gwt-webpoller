@@ -33,17 +33,17 @@ final class TestWebPoller
   {
     @Nonnull
     @Override
-    public WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
+    public WebPoller newWebPoller()
     {
-      return new TestWebPoller( new SimpleEventBus(), requestFactory );
+      return new TestWebPoller( new SimpleEventBus() );
     }
   }
 
   int _pollCount;
 
-  TestWebPoller( final EventBus eventBus, @Nonnull final RequestFactory requestFactory )
+  TestWebPoller( final EventBus eventBus )
   {
-    super( eventBus, requestFactory );
+    super( eventBus );
   }
 
   @Override

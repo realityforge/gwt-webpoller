@@ -5,6 +5,7 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
 import org.realityforge.gwt.webpoller.client.event.StartEvent;
@@ -24,14 +25,14 @@ public abstract class WebPoller
   public interface Factory
   {
     @Nonnull
-    WebPoller newWebPoller( @Nonnull RequestFactory requestFactory );
+    WebPoller newWebPoller();
   }
 
   private static Factory g_factory;
 
   private final RequestContext _requestContext = new WebPollerRequestContext();
   private final EventBus _eventBus;
-  private final RequestFactory _requestFactory;
+  private RequestFactory _requestFactory;
   private boolean _longPoll;
   private boolean _active;
   private int _errorCount;
@@ -42,13 +43,13 @@ public abstract class WebPoller
   private int _errorCountThreshold = DEFAULT_ERROR_COUNT_THRESHOLD;
   private Request _request;
 
-  public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
+  public static WebPoller newWebPoller()
   {
     if ( null == g_factory && GWT.isClient() )
     {
       register( new TimerBasedWebPoller.Factory() );
     }
-    return ( null != g_factory ) ? g_factory.newWebPoller( requestFactory ) : null;
+    return ( null != g_factory ) ? g_factory.newWebPoller() : null;
   }
 
   public static void register( @Nonnull final Factory factory )
@@ -69,11 +70,9 @@ public abstract class WebPoller
     }
   }
 
-  protected WebPoller( @Nonnull final EventBus eventBus,
-                       @Nonnull final RequestFactory requestFactory )
+  protected WebPoller( @Nonnull final EventBus eventBus )
   {
     _eventBus = eventBus;
-    _requestFactory = requestFactory;
   }
 
   /**
@@ -104,6 +103,10 @@ public abstract class WebPoller
     {
       throw new IllegalStateException( "Start invoked on active poller" );
     }
+    if ( null == _requestFactory )
+    {
+      throw new IllegalStateException( "Start invoked but no RequestFactory specified" );
+    }
     doStart();
   }
 
@@ -122,7 +125,16 @@ public abstract class WebPoller
     doStop();
   }
 
-  protected final RequestFactory getRequestFactory()
+  public void setRequestFactory( @Nullable final RequestFactory requestFactory )
+  {
+    if ( isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke setRequestFactory when poller active" );
+    }
+    _requestFactory = requestFactory;
+  }
+
+  public final RequestFactory getRequestFactory()
   {
     return _requestFactory;
   }

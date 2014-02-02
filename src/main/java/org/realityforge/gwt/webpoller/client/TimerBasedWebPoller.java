@@ -4,8 +4,6 @@ import com.google.gwt.user.client.Timer;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import javax.annotation.Nonnull;
-import org.realityforge.gwt.webpoller.client.RequestFactory;
-import org.realityforge.gwt.webpoller.client.WebPoller;
 
 /**
  * A web-poller that used the standard Timer class to schedule requests.
@@ -20,16 +18,15 @@ public class TimerBasedWebPoller
   {
     @Nonnull
     @Override
-    public WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
+    public WebPoller newWebPoller()
     {
-      return new TimerBasedWebPoller( new SimpleEventBus(), requestFactory );
+      return new TimerBasedWebPoller( new SimpleEventBus() );
     }
   }
 
-  public TimerBasedWebPoller( @Nonnull final EventBus eventBus,
-                              @Nonnull final RequestFactory requestFactory )
+  public TimerBasedWebPoller( @Nonnull final EventBus eventBus )
   {
-    super( eventBus, requestFactory );
+    super( eventBus );
   }
 
   @Override

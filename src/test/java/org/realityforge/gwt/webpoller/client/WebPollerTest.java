@@ -17,20 +17,20 @@ public class WebPollerTest
   @Test
   public void registryTest()
   {
-    final RequestFactory requestFactory = mock( RequestFactory.class );
-    assertNull( WebPoller.newWebPoller( requestFactory ) );
+    assertNull( WebPoller.newWebPoller() );
     final TestWebPoller.Factory factory = new TestWebPoller.Factory();
     WebPoller.register( factory );
-    assertNotNull( WebPoller.newWebPoller( requestFactory ) );
+    assertNotNull( WebPoller.newWebPoller() );
     assertTrue( WebPoller.deregister( factory ) );
-    assertNull( WebPoller.newWebPoller( requestFactory ) );
+    assertNull( WebPoller.newWebPoller() );
     assertFalse( WebPoller.deregister( factory ) );
   }
 
   @Test
   public void handlerInteractions()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    webPoller.setRequestFactory( new TestRequestFactory() );
 
     {
       final StartEvent.Handler handler = mock( StartEvent.Handler.class );
@@ -81,7 +81,8 @@ public class WebPollerTest
   @Test
   public void polling()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    webPoller.setRequestFactory( new TestRequestFactory() );
     webPoller.setLongPoll( false );
     webPoller.start();
 
@@ -120,7 +121,8 @@ public class WebPollerTest
   {
     final int errorCountThreshold = 7;
 
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    webPoller.setRequestFactory( new TestRequestFactory() );
 
     assertEquals( webPoller.getErrorCountThreshold(), 5 );
     assertEquals( webPoller.getPollDuration(), 2000 );

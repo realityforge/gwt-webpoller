@@ -3,7 +3,7 @@ package org.realityforge.gwt.webpoller.client;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.HashMap;
-import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
+import org.realityforge.gwt.webpoller.client.TestWebPoller.TestRequestFactory;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
 import org.realityforge.gwt.webpoller.client.event.StartEvent;
@@ -30,7 +30,7 @@ public class WebPollerTest
   @Test
   public void handlerInteractions()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
 
     {
       final StartEvent.Handler handler = mock( StartEvent.Handler.class );
@@ -81,7 +81,7 @@ public class WebPollerTest
   @Test
   public void polling()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
     webPoller.setLongPoll( false );
     webPoller.start();
 
@@ -120,7 +120,7 @@ public class WebPollerTest
   {
     final int errorCountThreshold = 7;
 
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), new TestRequestFactory() );
 
     assertEquals( webPoller.getErrorCountThreshold(), 5 );
     assertEquals( webPoller.getPollDuration(), 2000 );

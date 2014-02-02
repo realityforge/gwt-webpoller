@@ -1,8 +1,6 @@
 package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.Map;
@@ -24,12 +22,6 @@ public abstract class WebPoller
    */
   private static final int DEFAULT_ERROR_COUNT_THRESHOLD = 5;
 
-  public interface RequestFactory
-  {
-    @Nonnull
-    RequestBuilder getRequestBuilder( @Nonnull RequestCallback callback );
-  }
-
   public interface Factory
   {
     @Nonnull
@@ -37,6 +29,8 @@ public abstract class WebPoller
   }
 
   private static Factory g_factory;
+
+  private final RequestContext _requestContext = new WebPollerRequestContext();
   private final EventBus _eventBus;
   private final RequestFactory _requestFactory;
   private boolean _longPoll;
@@ -47,7 +41,7 @@ public abstract class WebPoller
    * The number of errors before the poller is marked as failed.
    */
   private int _errorCountThreshold = DEFAULT_ERROR_COUNT_THRESHOLD;
-  private boolean _inPoll;
+  private Request _request;
 
   public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
   {
@@ -193,7 +187,11 @@ public abstract class WebPoller
    */
   protected void doStop()
   {
-    _inPoll = false;
+    if ( null != _request  )
+    {
+      _request.cancel();
+      _request = null;
+    }
     _active = false;
     _errorCount = 0;
     onStop();
@@ -293,7 +291,7 @@ public abstract class WebPoller
    */
   protected final boolean isInPoll()
   {
-    return _inPoll;
+    return null != _request;
   }
 
   /**
@@ -302,7 +300,7 @@ public abstract class WebPoller
    */
   protected void pollReturned()
   {
-    _inPoll = false;
+    _request = null;
     if ( isActive() && isLongPoll() )
     {
       poll();
@@ -316,13 +314,52 @@ public abstract class WebPoller
   {
     if ( !isInPoll() )
     {
-      _inPoll = true;
       doPoll();
     }
+  }
+
+  protected final RequestContext getRequestContext()
+  {
+    return _requestContext;
   }
 
   /**
    * Sub-classes should override to perform actual polling.
    */
-  protected abstract void doPoll();
+  protected void doPoll()
+  {
+    try
+    {
+      _request = getRequestFactory().newRequest( getRequestContext() );
+    }
+    catch ( final Exception e )
+    {
+      getRequestContext().onError( e );
+    }
+  }
+
+  private class WebPollerRequestContext
+    implements RequestContext
+  {
+    @Override
+    public void onEmptyMessage()
+    {
+      WebPoller.this.onEmptyPollResult();
+      WebPoller.this.pollReturned();
+    }
+
+    @Override
+    public void onMessage( @Nonnull final Map<String, String> context, @Nonnull final String data )
+    {
+      WebPoller.this.onMessage( context, data );
+      WebPoller.this.pollReturned();
+    }
+
+    @Override
+    public void onError( @Nonnull final Throwable exception )
+    {
+      WebPoller.this.onError( exception );
+      WebPoller.this.pollReturned();
+    }
+  }
 }

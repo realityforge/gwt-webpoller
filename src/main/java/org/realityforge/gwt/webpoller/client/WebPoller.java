@@ -5,10 +5,10 @@ import com.google.gwt.http.client.Request;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import javax.annotation.Nonnull;
-import org.realityforge.gwt.webpoller.client.event.StartEvent;
-import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
+import org.realityforge.gwt.webpoller.client.event.StartEvent;
+import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.realityforge.gwt.webpoller.client.html5.Html5WebPoller;
 
 public abstract class WebPoller

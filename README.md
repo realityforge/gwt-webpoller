@@ -15,7 +15,7 @@ into the build system. i.e.
 <dependency>
    <groupId>org.realityforge.gwt.webpoller</groupId>
    <artifactId>gwt-webpoller</artifactId>
-   <version>0.1</version>
+   <version>0.2</version>
    <scope>provided</scope>
 </dependency>
 ```
@@ -34,8 +34,9 @@ Then you add the following snippet into the .gwt.xml file.
 Then you can interact with the WebPoller from within the browser.
 
 ```java
+final WebPoller webPoller = WebPoller.newWebPoller();
 final RequestBuilder requestBuilder = new RequestBuilder( RequestBuilder.GET, "http://example.com/someUrl" );
-final WebPoller webPoller = WebPoller.newWebPoller( new HttpRequestFactory( requestBuilder ) );
+webPoller.setRequestFactory( new HttpRequestFactory( requestBuilder ) );
 webPoller.addStartHandler( new StartEvent.Handler()
 {
   @Override

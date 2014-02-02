@@ -2,12 +2,11 @@ package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
-import org.mockito.Mockito;
 import org.realityforge.gwt.webpoller.client.WebPoller.RequestFactory;
-import org.realityforge.gwt.webpoller.client.event.StartEvent;
-import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
+import org.realityforge.gwt.webpoller.client.event.StartEvent;
+import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -67,11 +66,13 @@ public class WebPollerTest
     {
       final ErrorEvent.Handler handler = mock( ErrorEvent.Handler.class );
       final HandlerRegistration registration = webPoller.addErrorHandler( handler );
-      webPoller.onError();
-      verify( handler, only() ).onErrorEvent( any( ErrorEvent.class ) );
+      final Throwable exception = new Throwable();
+      webPoller.onError( exception );
+      final ErrorEvent expected = new ErrorEvent( webPoller, exception );
+      verify( handler, only() ).onErrorEvent( refEq( expected, "source" ) );
       registration.removeHandler();
-      webPoller.onError();
-      verify( handler, atMost( 1 ) ).onErrorEvent( Mockito.<ErrorEvent>anyObject() );
+      webPoller.onError( exception );
+      verify( handler, atMost( 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
     }
   }
 
@@ -232,21 +233,21 @@ public class WebPollerTest
     //Error state handling
     {
       assertFalse( webPoller.inError() );
-      webPoller.onError();
+      webPoller.onError( new Exception() );
       verify( errorHandler, atMost( 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
       assertTrue( webPoller.inError() );
 
       //A few more errors but not enough to close the poller
       for ( int i = 1; i < errorCountThreshold; i++ )
       {
-        webPoller.onError();
+        webPoller.onError( new Exception() );
       }
       verify( errorHandler, atMost( errorCountThreshold ) ).onErrorEvent( any( ErrorEvent.class ) );
       assertTrue( webPoller.inError() );
       assertTrue( webPoller.isActive() );
 
       // This should result in shutdown of poller
-      webPoller.onError();
+      webPoller.onError( new Exception() );
       assertFalse( webPoller.isActive() );
       assertFalse( webPoller.inError() );
       verify( errorHandler, atMost( errorCountThreshold + 1 ) ).onErrorEvent( any( ErrorEvent.class ) );

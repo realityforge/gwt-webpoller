@@ -276,9 +276,9 @@ public abstract class WebPoller
    * Fire an Error event.
    * If the number of successive errors reaches a threshold then shut-down the poller.
    */
-  protected final void onError()
+  protected final void onError( @Nonnull final Throwable exception )
   {
-    _eventBus.fireEventFromSource( new ErrorEvent( this ), this );
+    _eventBus.fireEventFromSource( new ErrorEvent( this, exception ), this );
     _errorCount++;
     if ( _errorCount > _errorCountThreshold )
     {

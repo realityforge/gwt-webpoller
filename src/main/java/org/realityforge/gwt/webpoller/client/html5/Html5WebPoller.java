@@ -108,7 +108,7 @@ public class Html5WebPoller
         @Override
         public void onError( final Request request, final Throwable exception )
         {
-          Html5WebPoller.this.onError();
+          Html5WebPoller.this.onError( exception );
           pollReturned();
         }
       } );
@@ -118,7 +118,7 @@ public class Html5WebPoller
     }
     catch ( final RequestException e )
     {
-      onError();
+      onError( e );
       pollReturned();
     }
   }

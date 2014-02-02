@@ -24,9 +24,18 @@ public class ErrorEvent
     return TYPE;
   }
 
-  public ErrorEvent( @Nonnull final WebPoller webPoller )
+  private final Throwable _exception;
+
+  public ErrorEvent( @Nonnull final WebPoller webPoller, @Nonnull final Throwable exception )
   {
     super( webPoller );
+    _exception = exception;
+  }
+
+  @Nonnull
+  public Throwable getException()
+  {
+    return _exception;
   }
 
   @Override

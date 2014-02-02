@@ -9,7 +9,6 @@ import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
 import org.realityforge.gwt.webpoller.client.event.MessageEvent;
 import org.realityforge.gwt.webpoller.client.event.StartEvent;
 import org.realityforge.gwt.webpoller.client.event.StopEvent;
-import org.realityforge.gwt.webpoller.client.TimerBasedWebPoller;
 
 public abstract class WebPoller
 {

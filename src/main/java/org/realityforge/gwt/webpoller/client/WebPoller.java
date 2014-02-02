@@ -28,23 +28,23 @@ public abstract class WebPoller
   public interface Factory
   {
     @Nonnull
-    WebPoller newWebPoller( @Nonnull RequestFactory requestFactory, boolean longPoll );
+    WebPoller newWebPoller( @Nonnull RequestFactory requestFactory );
   }
 
   private static Factory g_factory;
   private final EventBus _eventBus;
   private final RequestFactory _requestFactory;
-  private final boolean _longPoll;
+  private boolean _longPoll;
   private boolean _active;
   private int _errorCount;
 
-  public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
+  public static WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
   {
     if ( null == g_factory && GWT.isClient() )
     {
       register( new Html5WebPoller.Factory() );
     }
-    return ( null != g_factory ) ? g_factory.newWebPoller( requestFactory, longPoll ) : null;
+    return ( null != g_factory ) ? g_factory.newWebPoller( requestFactory ) : null;
   }
 
   public static void register( @Nonnull final Factory factory )
@@ -66,12 +66,10 @@ public abstract class WebPoller
   }
 
   protected WebPoller( @Nonnull final EventBus eventBus,
-                       @Nonnull final RequestFactory requestFactory,
-                       final boolean longPoll )
+                       @Nonnull final RequestFactory requestFactory )
   {
     _eventBus = eventBus;
     _requestFactory = requestFactory;
-    _longPoll = longPoll;
   }
 
   /**
@@ -125,9 +123,19 @@ public abstract class WebPoller
     return _requestFactory;
   }
 
-  protected final boolean isLongPoll()
+  public final boolean isLongPoll()
   {
     return _longPoll;
+  }
+
+  public void setLongPoll( final boolean longPoll )
+    throws IllegalStateException
+  {
+    if ( isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke setLongPoll when poller active" );
+    }
+    _longPoll = longPoll;
   }
 
   protected final EventBus getEventBus()

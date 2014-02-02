@@ -18,19 +18,19 @@ public class WebPollerTest
   public void registryTest()
   {
     final RequestFactory requestFactory = mock( RequestFactory.class );
-    assertNull( WebPoller.newWebPoller( requestFactory, true ) );
+    assertNull( WebPoller.newWebPoller( requestFactory ) );
     final TestWebPoller.Factory factory = new TestWebPoller.Factory();
     WebPoller.register( factory );
-    assertNotNull( WebPoller.newWebPoller( requestFactory, true ) );
+    assertNotNull( WebPoller.newWebPoller( requestFactory ) );
     assertTrue( WebPoller.deregister( factory ) );
-    assertNull( WebPoller.newWebPoller( requestFactory, true ) );
+    assertNull( WebPoller.newWebPoller( requestFactory ) );
     assertFalse( WebPoller.deregister( factory ) );
   }
 
   @Test
   public void handlerInteractions()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
 
     {
       final StartEvent.Handler handler = mock( StartEvent.Handler.class );
@@ -78,7 +78,7 @@ public class WebPollerTest
   @Test
   public void basicWorkflow()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ), true );
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus(), mock( RequestFactory.class ) );
 
     final StartEvent.Handler startHandler = mock( StartEvent.Handler.class );
     webPoller.addStartHandler( startHandler );
@@ -93,10 +93,25 @@ public class WebPollerTest
     {
       verify( startHandler, never() ).onStartEvent( any( StartEvent.class ) );
       assertFalse( webPoller.isActive() );
+      assertFalse( webPoller.isLongPoll() );
+
+      webPoller.setLongPoll( true );
+      assertTrue( webPoller.isLongPoll() );
 
       webPoller.start();
       assertTrue( webPoller.isActive() );
       verify( startHandler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
+
+      try
+      {
+        webPoller.setLongPoll( false );
+        fail("Should not be able to setLongPoll on started webPoller");
+      }
+      catch ( final IllegalStateException e )
+      {
+        //Ignore
+      }
+
     }
 
     // Try start again...

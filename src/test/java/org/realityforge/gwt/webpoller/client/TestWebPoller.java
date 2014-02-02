@@ -12,14 +12,14 @@ final class TestWebPoller
   {
     @Nonnull
     @Override
-    public WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory, final boolean longPoll )
+    public WebPoller newWebPoller( @Nonnull final RequestFactory requestFactory )
     {
-      return new TestWebPoller( new SimpleEventBus(), requestFactory, longPoll );
+      return new TestWebPoller( new SimpleEventBus(), requestFactory );
     }
   }
 
-  TestWebPoller( final EventBus eventBus, @Nonnull final RequestFactory requestFactory, final boolean longPoll )
+  TestWebPoller( final EventBus eventBus, @Nonnull final RequestFactory requestFactory )
   {
-    super( eventBus, requestFactory, longPoll );
+    super( eventBus, requestFactory );
   }
 }

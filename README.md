@@ -35,26 +35,41 @@ Then you can interact with the WebPoller from within the browser.
 
 ```java
 final WebPoller webPoller = WebPoller.newWebPoller( true );
-if ( null != webPoller )
+webPoller.addStartHandler( new StartEvent.Handler()
 {
-  webPoller.addOpenHandler( new OpenEvent.Handler()
+  @Override
+  public void onStartEvent( @Nonnull final StartEvent event )
   {
-    @Override
-    public void onOpenEvent( @Nonnull final OpenEvent event )
-    {
-      // Connected!
-    }
-  } );
-  webPoller.addMessageHandler( new MessageEvent.Handler()
+    // Polling started!
+  }
+} );
+webPoller.addStopHandler( new StopEvent.Handler()
+{
+  @Override
+  public void onStopEvent( @Nonnull final StopEvent event )
   {
-    @Override
-    public void onMessageEvent( @Nonnull final MessageEvent event )
-    {
-      //Handle message
-    }
-  } );
-  webPoller.connect( "someurl.ext" );
-}
+    // Polling stopped!
+  }
+} );
+webPoller.addMessageHandler( new MessageEvent.Handler()
+{
+  @Override
+  public void onMessageEvent( @Nonnull final MessageEvent event )
+  {
+    //Handle message
+  }
+} );
+webPoller.addErrorHandler( new ErrorEvent.Handler()
+{
+  @Override
+  public void onErrorEvent( @Nonnull final ErrorEvent event )
+  {
+    //Handle error
+  }
+} );
+webPoller.start();
+...
+webPoller.stop();
 ```
 
 This should be sufficient to put together a simple WebPoller application.

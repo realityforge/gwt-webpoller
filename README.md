@@ -34,7 +34,8 @@ Then you add the following snippet into the .gwt.xml file.
 Then you can interact with the WebPoller from within the browser.
 
 ```java
-final WebPoller webPoller = WebPoller.newWebPoller( true );
+final RequestBuilder requestBuilder = new RequestBuilder( RequestBuilder.GET, "http://example.com/someUrl" );
+final WebPoller webPoller = WebPoller.newWebPoller( new HttpRequestFactory( requestBuilder ) );
 webPoller.addStartHandler( new StartEvent.Handler()
 {
   @Override

@@ -1,7 +1,8 @@
 package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import javax.annotation.Nonnull;
@@ -21,7 +22,7 @@ public abstract class WebPoller
   public interface RequestFactory
   {
     @Nonnull
-    Request newRequest();
+    RequestBuilder getRequestBuilder( @Nonnull RequestCallback callback );
   }
 
   public interface Factory

@@ -232,7 +232,8 @@ public class WebPollerTest
       final String data = "Blah!";
       final HashMap<String, String> context = new HashMap<>();
       webPoller.onMessage( context, data );
-      verify( messageHandler, atMost( 1 ) ).onMessageEvent( refEq( new MessageEvent( webPoller, context, data ), "source" ) );
+      verify( messageHandler, atMost( 1 ) ).onMessageEvent(
+        refEq( new MessageEvent( webPoller, context, data ), "source" ) );
     }
 
     //Error state handling
@@ -258,5 +259,67 @@ public class WebPollerTest
       verify( errorHandler, atMost( errorCountThreshold + 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
       verify( stopHandler, atMost( 2 ) ).onStopEvent( any( StopEvent.class ) );
     }
+  }
+
+
+  @Test
+  public void pauseResume()
+  {
+    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    webPoller.setRequestFactory( new TestRequestFactory() );
+
+    try
+    {
+      webPoller.pause();
+      fail( "Able to pause an inactive poller" );
+    }
+    catch ( final IllegalStateException ise )
+    {
+      //Expected
+    }
+    try
+    {
+      webPoller.resume();
+      fail( "Able to resume an inactive poller" );
+    }
+    catch ( final IllegalStateException ise )
+    {
+      //Expected
+    }
+
+    webPoller.start();
+    try
+    {
+      webPoller.resume();
+      fail( "Able to resume an unpaused poller" );
+    }
+    catch ( final IllegalStateException ise )
+    {
+      //Expected
+    }
+
+    assertFalse( webPoller.isPaused() );
+    webPoller.pause();
+    assertTrue( webPoller.isPaused() );
+
+     try
+    {
+      webPoller.pause();
+      fail( "Able to pause a paused poller" );
+    }
+    catch ( final IllegalStateException ise )
+    {
+      //Expected
+    }
+
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 0 );
+
+    webPoller.resume();
+    assertEquals( webPoller._pollCount, 1 );
+
+    webPoller.pause();
+    webPoller.stop();
+    assertFalse( webPoller.isPaused() );
   }
 }

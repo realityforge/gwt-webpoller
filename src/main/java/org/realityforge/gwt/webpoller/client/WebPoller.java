@@ -35,6 +35,7 @@ public abstract class WebPoller
   private RequestFactory _requestFactory;
   private boolean _longPoll;
   private boolean _active;
+  private boolean _paused;
   private int _errorCount;
   private int _pollDuration = DEFAULT_POLL_DURATION;
   /**
@@ -188,6 +189,53 @@ public abstract class WebPoller
     _longPoll = longPoll;
   }
 
+  /**
+   * Pause the active poller.
+   * The poller will cease actually polling until resume is called.
+   *
+   * @throws IllegalStateException if poller is not active or poller is already paused
+   */
+  public void pause()
+  {
+    if ( !isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke pause when poller is inactive" );
+    }
+    if ( isPaused() )
+    {
+      throw new IllegalStateException( "Attempt to invoke pause when poller is already paused" );
+    }
+    _paused = true;
+  }
+
+  /**
+   * Resume an already paused poller.
+   * The poller will resume polling.
+   *
+   * @throws IllegalStateException if poller is not active or poller is not paused.
+   */
+  public void resume()
+  {
+    if ( !isActive() )
+    {
+      throw new IllegalStateException( "Attempt to invoke resume when poller is inactive" );
+    }
+    if ( !isPaused() )
+    {
+      throw new IllegalStateException( "Attempt to invoke resume when poller is not paused" );
+    }
+    _paused = false;
+    poll();
+  }
+
+  /**
+   * @return true if poller is paused.
+   */
+  public boolean isPaused()
+  {
+    return _paused;
+  }
+
   protected final EventBus getEventBus()
   {
     return _eventBus;
@@ -203,6 +251,7 @@ public abstract class WebPoller
       _request.cancel();
       _request = null;
     }
+    _paused = false;
     _active = false;
     _errorCount = 0;
     onStop();
@@ -323,7 +372,7 @@ public abstract class WebPoller
    */
   protected final void poll()
   {
-    if ( !isInPoll() )
+    if ( !isInPoll() && !isPaused() )
     {
       doPoll();
     }

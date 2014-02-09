@@ -56,7 +56,7 @@ public class WebPollerTest
     {
       final MessageEvent.Handler handler = mock( MessageEvent.Handler.class );
       final HandlerRegistration registration = webPoller.addMessageHandler( handler );
-      final HashMap<String, String> context = new HashMap<>();
+      final HashMap<String, String> context = new HashMap<String, String>();
       webPoller.onMessage( context, "Blah" );
       final MessageEvent expected = new MessageEvent( webPoller, context, "Blah" );
       verify( handler, only() ).onMessageEvent( refEq( expected, "source" ) );
@@ -230,7 +230,7 @@ public class WebPollerTest
     //Does data flow through
     {
       final String data = "Blah!";
-      final HashMap<String, String> context = new HashMap<>();
+      final HashMap<String, String> context = new HashMap<String, String>();
       webPoller.onMessage( context, data );
       verify( messageHandler, atMost( 1 ) ).onMessageEvent(
         refEq( new MessageEvent( webPoller, context, data ), "source" ) );

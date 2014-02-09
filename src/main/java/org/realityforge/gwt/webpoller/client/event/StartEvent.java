@@ -18,7 +18,7 @@ public class StartEvent
     void onStartEvent( @Nonnull StartEvent event );
   }
 
-  private static final GwtEvent.Type<Handler> TYPE = new Type<>();
+  private static final GwtEvent.Type<Handler> TYPE = new Type<Handler>();
 
   public static GwtEvent.Type<Handler> getType()
   {

@@ -1,3 +1,7 @@
+## 0.4:
+
+* Restore Java 6 compatibility.
+
 ## 0.3:
 
 * Support pausing and resuming an active poller.

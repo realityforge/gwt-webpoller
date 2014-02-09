@@ -17,7 +17,7 @@ public class StopEvent
     void onStopEvent( @Nonnull StopEvent event );
   }
 
-  private static final Type<Handler> TYPE = new Type<>();
+  private static final Type<Handler> TYPE = new Type<Handler>();
 
   public static Type<Handler> getType()
   {

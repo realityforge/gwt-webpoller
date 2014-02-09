@@ -33,7 +33,7 @@ public abstract class AbstractHttpRequestFactory
         }
         else
         {
-          final HashMap<String, String> context = new HashMap<>();
+          final HashMap<String, String> context = new HashMap<String, String>();
           for ( final Header header : response.getHeaders() )
           {
             context.put( header.getName(), header.getValue() );

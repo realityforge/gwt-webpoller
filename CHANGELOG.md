@@ -1,4 +1,5 @@
 ## 0.3:
+
 * Support pausing and resuming an active poller.
 
 ## 0.2:

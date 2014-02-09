@@ -15,7 +15,7 @@ into the build system. i.e.
 <dependency>
    <groupId>org.realityforge.gwt.webpoller</groupId>
    <artifactId>gwt-webpoller</artifactId>
-   <version>0.2</version>
+   <version>0.4</version>
    <scope>provided</scope>
 </dependency>
 ```

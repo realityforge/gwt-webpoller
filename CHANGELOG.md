@@ -1,3 +1,9 @@
+## 0.5:
+
+* Add a method to AbstractHttpRequestFactory that determines whether a response is
+  an error. The default implementation treats all non-200 status code responses as
+  errors.
+
 ## 0.4:
 
 * Restore Java 6 compatibility.

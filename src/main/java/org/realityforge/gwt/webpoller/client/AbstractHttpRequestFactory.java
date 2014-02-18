@@ -6,6 +6,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * An request factory that uses the standard GWT HTTP module.
@@ -26,19 +27,27 @@ public abstract class AbstractHttpRequestFactory
       @Override
       public void onResponseReceived( final com.google.gwt.http.client.Request request, final Response response )
       {
-        final String data = response.getText();
-        if ( 0 == data.length() )
+        final Throwable error = getError( response );
+        if ( null != error )
         {
-          requestContext.onEmptyMessage();
+          requestContext.onError( error );
         }
         else
         {
-          final HashMap<String, String> context = new HashMap<String, String>();
-          for ( final Header header : response.getHeaders() )
+          final String data = response.getText();
+          if ( 0 == data.length() )
           {
-            context.put( header.getName(), header.getValue() );
+            requestContext.onEmptyMessage();
           }
-          requestContext.onMessage( context, response.getText() );
+          else
+          {
+            final HashMap<String, String> context = new HashMap<String, String>();
+            for ( final Header header : response.getHeaders() )
+            {
+              context.put( header.getName(), header.getValue() );
+            }
+            requestContext.onMessage( context, response.getText() );
+          }
         }
       }
 
@@ -49,6 +58,26 @@ public abstract class AbstractHttpRequestFactory
       }
     } );
     return new HttpRequest( requestBuilder.send() );
+  }
+
+  /**
+   * Return error associated with response.
+   *
+   * @param response the response.
+   * @return the error if any, null otherwise.
+   */
+  @Nullable
+  protected Throwable getError( @Nonnull final Response response )
+  {
+    final int statusCode = response.getStatusCode();
+    if ( Response.SC_OK == statusCode )
+    {
+      return null;
+    }
+    else
+    {
+      return new Exception( "Bad status code: " + statusCode );
+    }
   }
 
   /**

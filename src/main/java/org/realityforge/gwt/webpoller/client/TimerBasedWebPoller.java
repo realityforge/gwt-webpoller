@@ -1,8 +1,6 @@
 package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.user.client.Timer;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.SimpleEventBus;
 import javax.annotation.Nonnull;
 
 /**
@@ -20,13 +18,8 @@ public class TimerBasedWebPoller
     @Override
     public WebPoller newWebPoller()
     {
-      return new TimerBasedWebPoller( new SimpleEventBus() );
+      return new TimerBasedWebPoller();
     }
-  }
-
-  public TimerBasedWebPoller( @Nonnull final EventBus eventBus )
-  {
-    super( eventBus );
   }
 
   @Override

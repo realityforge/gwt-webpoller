@@ -1,13 +1,7 @@
 package org.realityforge.gwt.webpoller.client;
 
-import com.google.gwt.event.shared.SimpleEventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.HashMap;
 import org.realityforge.gwt.webpoller.client.TestWebPoller.TestRequestFactory;
-import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
-import org.realityforge.gwt.webpoller.client.event.MessageEvent;
-import org.realityforge.gwt.webpoller.client.event.StartEvent;
-import org.realityforge.gwt.webpoller.client.event.StopEvent;
 import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -27,61 +21,9 @@ public class WebPollerTest
   }
 
   @Test
-  public void handlerInteractions()
-  {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
-    webPoller.setRequestFactory( new TestRequestFactory() );
-
-    {
-      final StartEvent.Handler handler = mock( StartEvent.Handler.class );
-      final HandlerRegistration registration = webPoller.addStartHandler( handler );
-      webPoller.onStart();
-      verify( handler, only() ).onStartEvent( refEq( new StartEvent( webPoller ), "source" ) );
-      registration.removeHandler();
-      webPoller.onStart();
-      verify( handler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
-    }
-
-    {
-      final StopEvent.Handler handler = mock( StopEvent.Handler.class );
-      final HandlerRegistration registration = webPoller.addStopHandler( handler );
-      webPoller.onStop();
-      final StopEvent expected = new StopEvent( webPoller );
-      verify( handler, only() ).onStopEvent( refEq( expected, "source" ) );
-      registration.removeHandler();
-      webPoller.onStop();
-      verify( handler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
-    }
-
-    {
-      final MessageEvent.Handler handler = mock( MessageEvent.Handler.class );
-      final HandlerRegistration registration = webPoller.addMessageHandler( handler );
-      final HashMap<String, String> context = new HashMap<String, String>();
-      webPoller.onMessage( context, "Blah" );
-      final MessageEvent expected = new MessageEvent( webPoller, context, "Blah" );
-      verify( handler, only() ).onMessageEvent( refEq( expected, "source" ) );
-      registration.removeHandler();
-      webPoller.onMessage( context, "Blah" );
-      verify( handler, atMost( 1 ) ).onMessageEvent( any( MessageEvent.class ) );
-    }
-
-    {
-      final ErrorEvent.Handler handler = mock( ErrorEvent.Handler.class );
-      final HandlerRegistration registration = webPoller.addErrorHandler( handler );
-      final Throwable exception = new Throwable();
-      webPoller.onError( exception );
-      final ErrorEvent expected = new ErrorEvent( webPoller, exception );
-      verify( handler, only() ).onErrorEvent( refEq( expected, "source" ) );
-      registration.removeHandler();
-      webPoller.onError( exception );
-      verify( handler, atMost( 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
-    }
-  }
-
-  @Test
   public void polling()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    final TestWebPoller webPoller = new TestWebPoller();
     webPoller.setRequestFactory( new TestRequestFactory() );
     webPoller.setLongPoll( false );
     webPoller.start();
@@ -121,24 +63,18 @@ public class WebPollerTest
   {
     final int errorCountThreshold = 7;
 
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    final TestWebPoller webPoller = new TestWebPoller();
     webPoller.setRequestFactory( new TestRequestFactory() );
 
     assertEquals( webPoller.getErrorCountThreshold(), 5 );
     assertEquals( webPoller.getPollDuration(), 2000 );
 
-    final StartEvent.Handler startHandler = mock( StartEvent.Handler.class );
-    webPoller.addStartHandler( startHandler );
-    final StopEvent.Handler stopHandler = mock( StopEvent.Handler.class );
-    webPoller.addStopHandler( stopHandler );
-    final MessageEvent.Handler messageHandler = mock( MessageEvent.Handler.class );
-    webPoller.addMessageHandler( messageHandler );
-    final ErrorEvent.Handler errorHandler = mock( ErrorEvent.Handler.class );
-    webPoller.addErrorHandler( errorHandler );
+    final WebPollerListener listener = mock( WebPollerListener.class );
+    webPoller.setListener( listener );
 
     // Test start
     {
-      verify( startHandler, never() ).onStartEvent( any( StartEvent.class ) );
+      verify( listener, never() ).onStart( webPoller );
       assertFalse( webPoller.isActive() );
       assertFalse( webPoller.isLongPoll() );
 
@@ -149,7 +85,7 @@ public class WebPollerTest
 
       webPoller.start();
       assertTrue( webPoller.isActive() );
-      verify( startHandler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
+      verify( listener, atMost( 1 ) ).onStart( webPoller );
 
       try
       {
@@ -192,18 +128,18 @@ public class WebPollerTest
       catch ( final IllegalStateException ise )
       {
         assertTrue( webPoller.isActive() );
-        verify( startHandler, atMost( 1 ) ).onStartEvent( any( StartEvent.class ) );
+        verify( listener, atMost( 1 ) ).onStart( webPoller );
       }
     }
 
     // Test stop
     {
-      verify( stopHandler, never() ).onStopEvent( any( StopEvent.class ) );
+      verify( listener, never() ).onStop( webPoller );
       assertTrue( webPoller.isActive() );
 
       webPoller.stop();
       assertFalse( webPoller.isActive() );
-      verify( stopHandler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
+      verify( listener, atMost( 1 ) ).onStop( webPoller );
     }
 
     // Try to stop again...
@@ -216,7 +152,7 @@ public class WebPollerTest
       catch ( final IllegalStateException ise )
       {
         assertFalse( webPoller.isActive() );
-        verify( stopHandler, atMost( 1 ) ).onStopEvent( any( StopEvent.class ) );
+        verify( listener, atMost( 1 ) ).onStop( webPoller );
       }
     }
 
@@ -224,7 +160,7 @@ public class WebPollerTest
     {
       webPoller.start();
       assertTrue( webPoller.isActive() );
-      verify( startHandler, atMost( 2 ) ).onStartEvent( any( StartEvent.class ) );
+      verify( listener, atMost( 2 ) ).onStart( webPoller );
     }
 
     //Does data flow through
@@ -232,15 +168,15 @@ public class WebPollerTest
       final String data = "Blah!";
       final HashMap<String, String> context = new HashMap<String, String>();
       webPoller.onMessage( context, data );
-      verify( messageHandler, atMost( 1 ) ).onMessageEvent(
-        refEq( new MessageEvent( webPoller, context, data ), "source" ) );
+      verify( listener, atMost( 1 ) ).onMessage( webPoller, context, data );
     }
 
     //Error state handling
     {
       assertFalse( webPoller.inError() );
-      webPoller.onError( new Exception() );
-      verify( errorHandler, atMost( 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
+      final Exception exception = new Exception();
+      webPoller.onError( exception );
+      verify( listener, atMost( 1 ) ).onError( webPoller, exception );
       assertTrue( webPoller.inError() );
 
       //A few more errors but not enough to close the poller
@@ -248,7 +184,7 @@ public class WebPollerTest
       {
         webPoller.onError( new Exception() );
       }
-      verify( errorHandler, atMost( errorCountThreshold ) ).onErrorEvent( any( ErrorEvent.class ) );
+      verify( listener, atMost( errorCountThreshold ) ).onError( eq( webPoller ), any( Exception.class ) );
       assertTrue( webPoller.inError() );
       assertTrue( webPoller.isActive() );
 
@@ -256,8 +192,8 @@ public class WebPollerTest
       webPoller.onError( new Exception() );
       assertFalse( webPoller.isActive() );
       assertFalse( webPoller.inError() );
-      verify( errorHandler, atMost( errorCountThreshold + 1 ) ).onErrorEvent( any( ErrorEvent.class ) );
-      verify( stopHandler, atMost( 2 ) ).onStopEvent( any( StopEvent.class ) );
+      verify( listener, atMost( errorCountThreshold + 1 ) ).onError( eq( webPoller ), any( Exception.class ) );
+      verify( listener, atMost( 2 ) ).onStop( webPoller );
     }
   }
 
@@ -265,7 +201,7 @@ public class WebPollerTest
   @Test
   public void pauseResume()
   {
-    final TestWebPoller webPoller = new TestWebPoller( new SimpleEventBus() );
+    final TestWebPoller webPoller = new TestWebPoller();
     webPoller.setRequestFactory( new TestRequestFactory() );
 
     try
@@ -302,7 +238,7 @@ public class WebPollerTest
     webPoller.pause();
     assertTrue( webPoller.isPaused() );
 
-     try
+    try
     {
       webPoller.pause();
       fail( "Able to pause a paused poller" );

@@ -1,3 +1,9 @@
+## 0.6:
+
+* Move WebPoller to using the WebPollerListener interface as the primary means of notifying library
+  consumers of WebPoller events. Add an EventBasedWebPollerListener to support the previous
+  event-oriented mechanisms of integrating with the WebPoller library.
+
 ## 0.5:
 
 * Add a method to AbstractHttpRequestFactory that determines whether a response is

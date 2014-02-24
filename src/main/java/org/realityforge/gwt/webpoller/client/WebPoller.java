@@ -1,15 +1,9 @@
 package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.realityforge.gwt.webpoller.client.event.ErrorEvent;
-import org.realityforge.gwt.webpoller.client.event.MessageEvent;
-import org.realityforge.gwt.webpoller.client.event.StartEvent;
-import org.realityforge.gwt.webpoller.client.event.StopEvent;
 
 public abstract class WebPoller
 {
@@ -31,7 +25,7 @@ public abstract class WebPoller
   private static Factory g_factory;
 
   private final RequestContext _requestContext = new WebPollerRequestContext();
-  private final EventBus _eventBus;
+  private WebPollerListener _listener = NullWebPollerListener.INSTANCE;
   private RequestFactory _requestFactory;
   private boolean _longPoll;
   private boolean _active;
@@ -69,11 +63,6 @@ public abstract class WebPoller
       g_factory = null;
       return true;
     }
-  }
-
-  protected WebPoller( @Nonnull final EventBus eventBus )
-  {
-    _eventBus = eventBus;
   }
 
   /**
@@ -189,6 +178,11 @@ public abstract class WebPoller
     _longPoll = longPoll;
   }
 
+  public void setListener( @Nullable final WebPollerListener listener )
+  {
+    _listener = null == listener ? NullWebPollerListener.INSTANCE : listener;
+  }
+
   /**
    * Pause the active poller.
    * The poller will cease actually polling until resume is called.
@@ -236,17 +230,12 @@ public abstract class WebPoller
     return _paused;
   }
 
-  protected final EventBus getEventBus()
-  {
-    return _eventBus;
-  }
-
   /**
    * Sub-classes should override this method to provide functionality.
    */
   protected void doStop()
   {
-    if ( null != _request  )
+    if ( null != _request )
     {
       _request.cancel();
       _request = null;
@@ -282,36 +271,12 @@ public abstract class WebPoller
     _errorCount = 0;
   }
 
-  @Nonnull
-  public final HandlerRegistration addStartHandler( @Nonnull StartEvent.Handler handler )
-  {
-    return getEventBus().addHandler( StartEvent.getType(), handler );
-  }
-
-  @Nonnull
-  public final HandlerRegistration addStopHandler( @Nonnull StopEvent.Handler handler )
-  {
-    return getEventBus().addHandler( StopEvent.getType(), handler );
-  }
-
-  @Nonnull
-  public final HandlerRegistration addMessageHandler( @Nonnull MessageEvent.Handler handler )
-  {
-    return getEventBus().addHandler( MessageEvent.getType(), handler );
-  }
-
-  @Nonnull
-  public final HandlerRegistration addErrorHandler( @Nonnull ErrorEvent.Handler handler )
-  {
-    return getEventBus().addHandler( ErrorEvent.getType(), handler );
-  }
-
   /**
    * Fire a Start event.
    */
   protected final void onStart()
   {
-    _eventBus.fireEventFromSource( new StartEvent( this ), this );
+    _listener.onStart( this );
   }
 
   /**
@@ -319,7 +284,7 @@ public abstract class WebPoller
    */
   protected final void onStop()
   {
-    _eventBus.fireEventFromSource( new StopEvent( this ), this );
+    _listener.onStop( this );
   }
 
   /**
@@ -328,7 +293,7 @@ public abstract class WebPoller
   protected final void onMessage( @Nonnull final Map<String, String> context,
                                   @Nonnull final String data )
   {
-    _eventBus.fireEventFromSource( new MessageEvent( this, context, data ), this );
+    _listener.onMessage( this, context, data );
     resetErrorState();
   }
 
@@ -338,7 +303,7 @@ public abstract class WebPoller
    */
   protected final void onError( @Nonnull final Throwable exception )
   {
-    _eventBus.fireEventFromSource( new ErrorEvent( this, exception ), this );
+    _listener.onError( this, exception );
     _errorCount++;
     if ( _errorCount > _errorCountThreshold )
     {

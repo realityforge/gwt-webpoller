@@ -1,13 +1,11 @@
 package org.realityforge.gwt.webpoller.client;
 
-import com.google.web.bindery.event.shared.EventBus;
-import com.google.web.bindery.event.shared.SimpleEventBus;
 import javax.annotation.Nonnull;
 
-final class TestWebPoller
+public final class TestWebPoller
   extends WebPoller
 {
-  static class TestRequest
+  public static class TestRequest
     implements Request
   {
     @Override
@@ -16,7 +14,7 @@ final class TestWebPoller
     }
   }
 
-  static class TestRequestFactory
+  public static class TestRequestFactory
     implements RequestFactory
   {
     @Nonnull
@@ -28,23 +26,18 @@ final class TestWebPoller
     }
   }
 
-  static class Factory
+  public static class Factory
     implements WebPoller.Factory
   {
     @Nonnull
     @Override
     public WebPoller newWebPoller()
     {
-      return new TestWebPoller( new SimpleEventBus() );
+      return new TestWebPoller();
     }
   }
 
   int _pollCount;
-
-  TestWebPoller( final EventBus eventBus )
-  {
-    super( eventBus );
-  }
 
   @Override
   protected void doPoll()

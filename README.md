@@ -15,7 +15,7 @@ into the build system. i.e.
 <dependency>
    <groupId>org.realityforge.gwt.webpoller</groupId>
    <artifactId>gwt-webpoller</artifactId>
-   <version>0.4</version>
+   <version>0.6</version>
    <scope>provided</scope>
 </dependency>
 ```
@@ -37,34 +37,30 @@ Then you can interact with the WebPoller from within the browser.
 final WebPoller webPoller = WebPoller.newWebPoller();
 final RequestBuilder requestBuilder = new RequestBuilder( RequestBuilder.GET, "http://example.com/someUrl" );
 webPoller.setRequestFactory( new HttpRequestFactory( requestBuilder ) );
-webPoller.addStartHandler( new StartEvent.Handler()
+webPoller.setListener( new WebPollerListenerAdapter()
 {
   @Override
-  public void onStartEvent( @Nonnull final StartEvent event )
+  public void onStart( @Nonnull final WebPoller webPoller )
   {
     // Polling started!
   }
-} );
-webPoller.addStopHandler( new StopEvent.Handler()
-{
+
   @Override
-  public void onStopEvent( @Nonnull final StopEvent event )
+  public void onStop( @Nonnull final WebPoller webPoller )
   {
     // Polling stopped!
   }
-} );
-webPoller.addMessageHandler( new MessageEvent.Handler()
-{
+
   @Override
-  public void onMessageEvent( @Nonnull final MessageEvent event )
+  public void onMessage( @Nonnull final WebPoller webPoller,
+                         @Nonnull final Map<String, String> context,
+                         @Nonnull final String data )
   {
     //Handle message
   }
-} );
-webPoller.addErrorHandler( new ErrorEvent.Handler()
-{
+
   @Override
-  public void onErrorEvent( @Nonnull final ErrorEvent event )
+  public void onError( @Nonnull final WebPoller webPoller, @Nonnull final Throwable exception )
   {
     //Handle error
   }

@@ -233,8 +233,9 @@ public abstract class WebPoller
   /**
    * Sub-classes should override this method to provide functionality.
    */
-  protected void doStop()
+  protected final void doStop()
   {
+    stopTimer();
     if ( null != _request )
     {
       _request.cancel();
@@ -247,13 +248,31 @@ public abstract class WebPoller
   }
 
   /**
+   * Stop the timer that is triggering the polling if any exists.
+   */
+  protected abstract void stopTimer();
+
+  /**
    * Sub-classes should override this method to provide functionality.
    */
-  protected void doStart()
+  protected final void doStart()
   {
     _active = true;
     onStart();
+    if ( isLongPoll() )
+    {
+      poll();
+    }
+    else
+    {
+      startTimer();
+    }
   }
+
+  /**
+   * Start the timer that triggers the polling.
+   */
+  protected abstract void startTimer();
 
   /**
    * Invoked after a successful poll returning no data.

@@ -23,29 +23,13 @@ public class TimerBasedWebPoller
   }
 
   @Override
-  protected void doStop()
+  protected void startTimer()
   {
-    stopTimer();
-    super.doStop();
-  }
-
-  @Override
-  protected void doStart()
-  {
-    super.doStart();
-    if ( isLongPoll() )
+    if ( null != _timer )
     {
-      poll();
+      stopTimer();
     }
-    else
-    {
-      startTimer();
-    }
-  }
 
-  private void startTimer()
-  {
-    stopTimer();
     _timer = new Timer()
     {
       @Override
@@ -58,7 +42,8 @@ public class TimerBasedWebPoller
     _timer.scheduleRepeating( getPollDuration() );
   }
 
-  private void stopTimer()
+  @Override
+  protected void stopTimer()
   {
     if ( null != _timer )
     {

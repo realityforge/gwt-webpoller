@@ -38,11 +38,25 @@ public final class TestWebPoller
   }
 
   int _pollCount;
+  int _startTimerCount;
+  int _stopTimerCount;
 
   @Override
   protected void doPoll()
   {
     super.doPoll();
     _pollCount++;
+  }
+
+  @Override
+  protected void stopTimer()
+  {
+    _stopTimerCount++;
+  }
+
+  @Override
+  protected void startTimer()
+  {
+    _startTimerCount++;
   }
 }

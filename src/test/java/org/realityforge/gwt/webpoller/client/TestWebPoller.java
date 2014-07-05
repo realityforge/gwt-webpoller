@@ -5,6 +5,8 @@ import javax.annotation.Nonnull;
 public final class TestWebPoller
   extends WebPoller
 {
+  boolean _timerActive;
+
   public static class TestRequest
     implements Request
   {
@@ -40,6 +42,8 @@ public final class TestWebPoller
   int _pollCount;
   int _startTimerCount;
   int _stopTimerCount;
+  int _startErrorTimerCount;
+  int _stopErrorTimerCount;
 
   @Override
   protected void doPoll()
@@ -58,5 +62,23 @@ public final class TestWebPoller
   protected void startTimer()
   {
     _startTimerCount++;
+  }
+
+  @Override
+  protected void startErrorTimer()
+  {
+    _startErrorTimerCount++;
+  }
+
+  @Override
+  protected void stopErrorTimer()
+  {
+    _stopErrorTimerCount++;
+  }
+
+  @Override
+  protected boolean isTimerActive()
+  {
+    return _timerActive;
   }
 }

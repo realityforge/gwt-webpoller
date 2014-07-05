@@ -1,3 +1,12 @@
+## 0.7:
+
+* Refactor WebPoller to remove "LongPoll" flag and "PollDuration" configuration. Replace
+  concepts with "InterRequestDuration" setting that determines the amount of time between
+  one request completing and the next request starting.
+* Add "InterErrorDuration" setting that determines the amount of time between
+  one error and re-attempting the next request.
+* Add WebPoller.setLogLevel() method to make it easier to debug WebPoller.
+
 ## 0.6:
 
 * Move WebPoller to using the WebPollerListener interface as the primary means of notifying library

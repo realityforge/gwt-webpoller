@@ -1,6 +1,7 @@
 package org.realityforge.gwt.webpoller.client;
 
 import java.util.HashMap;
+import java.util.logging.Level;
 import org.realityforge.gwt.webpoller.client.TestWebPoller.TestRequestFactory;
 import org.testng.annotations.Test;
 import static org.mockito.Mockito.*;
@@ -25,7 +26,8 @@ public class WebPollerTest
   {
     final TestWebPoller webPoller = new TestWebPoller();
     webPoller.setRequestFactory( new TestRequestFactory() );
-    webPoller.setLongPoll( false );
+    webPoller.setInterRequestDuration( 100 );
+    webPoller.setLogLevel( Level.OFF );
     webPoller.start();
 
     assertFalse( webPoller.isInPoll() );
@@ -42,7 +44,7 @@ public class WebPollerTest
 
     // Now test long polling
 
-    webPoller.setLongPoll( true );
+    webPoller.setInterRequestDuration( 0 );
     webPoller.start();
 
     webPoller.poll();
@@ -59,6 +61,75 @@ public class WebPollerTest
   }
 
   @Test
+  public void pollInError()
+  {
+    final TestWebPoller webPoller = new TestWebPoller();
+    webPoller.setRequestFactory( new TestRequestFactory() );
+    webPoller.setInterRequestDuration( 100 );
+    webPoller.setInterErrorDuration( 100 );
+    webPoller.setErrorCountThreshold( 2 );
+
+    final WebPollerListener listener = mock( WebPollerListener.class );
+    webPoller.setListener( listener );
+
+    webPoller.start();
+
+    assertFalse( webPoller.isInPoll() );
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 1 );
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 1 );
+    assertTrue( webPoller.isInPoll() );
+
+    assertEquals( webPoller._startErrorTimerCount, 0 );
+    final Throwable exception1 = new Throwable();
+    webPoller.onError( exception1 );
+    assertTrue( webPoller.inError() );
+    assertEquals( webPoller._startErrorTimerCount, 1 );
+    assertEquals( webPoller._stopErrorTimerCount, 0 );
+    verify( listener ).onError( webPoller, exception1 );
+
+    // Poll completes...
+    webPoller.pollReturned();
+    assertEquals( webPoller._pollCount, 1 );
+    assertFalse( webPoller.isInPoll() );
+
+    // Error Timer triggers another poll
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 2 );
+    assertTrue( webPoller.isInPoll() );
+
+    final Throwable exception2 = new Throwable();
+    webPoller.onError( exception2 );
+    verify( listener ).onError( webPoller, exception2 );
+    assertTrue( webPoller.inError() );
+    assertEquals( webPoller._startErrorTimerCount, 1 );
+    assertEquals( webPoller._stopErrorTimerCount, 0 );
+
+    // Poll completes...
+    webPoller.pollReturned();
+    assertEquals( webPoller._pollCount, 2 );
+    assertFalse( webPoller.isInPoll() );
+
+    // Error Timer triggers another poll
+    webPoller.poll();
+    assertEquals( webPoller._pollCount, 3 );
+    assertTrue( webPoller.isInPoll() );
+
+    assertEquals( webPoller._stopTimerCount, 0 );
+    final Throwable exception3 = new Throwable();
+    webPoller.onError( exception3 );
+    verify( listener ).onError( webPoller, exception3 );
+    verify( listener ).onStop( webPoller );
+    assertEquals( webPoller._startErrorTimerCount, 1 );
+    assertEquals( webPoller._stopErrorTimerCount, 1 );
+    assertEquals( webPoller._stopTimerCount, 0 );
+    assertFalse( webPoller.isInPoll() );
+    assertFalse( webPoller.isActive() );
+    assertFalse( webPoller.inError() );
+  }
+
+  @Test
   public void basicWorkflow()
   {
     final int errorCountThreshold = 7;
@@ -66,8 +137,9 @@ public class WebPollerTest
     final TestWebPoller webPoller = new TestWebPoller();
     webPoller.setRequestFactory( new TestRequestFactory() );
 
-    assertEquals( webPoller.getErrorCountThreshold(), 5 );
-    assertEquals( webPoller.getPollDuration(), 2000 );
+    assertEquals( webPoller.getErrorCountThreshold(), WebPoller.DEFAULT_ERROR_COUNT_THRESHOLD );
+    assertEquals( webPoller.getInterRequestDuration(), WebPoller.DEFAULT_INTER_REQUEST_DURATION );
+    assertEquals( webPoller.getInterErrorDuration(), WebPoller.DEFAULT_INTER_ERROR_DURATION );
 
     final WebPollerListener listener = mock( WebPollerListener.class );
     webPoller.setListener( listener );
@@ -76,20 +148,26 @@ public class WebPollerTest
     {
       verify( listener, never() ).onStart( webPoller );
       assertFalse( webPoller.isActive() );
-      assertFalse( webPoller.isLongPoll() );
 
-      webPoller.setPollDuration( 50 );
+      webPoller.setInterRequestDuration( 50 );
+      assertEquals( webPoller.getInterRequestDuration(), 50 );
+
+      webPoller.setInterErrorDuration( 52 );
+      assertEquals( webPoller.getInterErrorDuration(), 52 );
+
       webPoller.setErrorCountThreshold( errorCountThreshold );
-      webPoller.setLongPoll( true );
-      assertTrue( webPoller.isLongPoll() );
+      assertEquals( webPoller.getErrorCountThreshold(), errorCountThreshold );
+
+      webPoller.setInterRequestDuration( 0 );
+      assertEquals( webPoller.getInterRequestDuration(), 0 );
 
       webPoller.start();
       assertTrue( webPoller.isActive() );
-      verify( listener, atMost( 1 ) ).onStart( webPoller );
+      verify( listener, times( 1 ) ).onStart( webPoller );
 
       try
       {
-        webPoller.setLongPoll( false );
+        webPoller.setInterRequestDuration( 23 );
         fail( "Should not be able to setLongPoll on started webPoller" );
       }
       catch ( final IllegalStateException e )
@@ -109,8 +187,8 @@ public class WebPollerTest
 
       try
       {
-        webPoller.setPollDuration( 50 );
-        fail( "Should not be able to setPollDuration on started webPoller" );
+        webPoller.setInterRequestDuration( 50 );
+        fail( "Should not be able to setInterRequestDuration on started webPoller" );
       }
       catch ( final IllegalStateException e )
       {

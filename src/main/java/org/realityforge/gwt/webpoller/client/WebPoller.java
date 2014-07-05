@@ -2,19 +2,27 @@ package org.realityforge.gwt.webpoller.client;
 
 import com.google.gwt.core.shared.GWT;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class WebPoller
 {
+  private static final Logger LOG = Logger.getLogger( WebPoller.class.getName() );
+
   /**
    * The duration between polls when not using long polling.
    */
-  private static final int DEFAULT_POLL_DURATION = 2000;
+  public static final int DEFAULT_INTER_REQUEST_DURATION = 2000;
+  /**
+   * The duration between attempts when in error.
+   */
+  public static final int DEFAULT_INTER_ERROR_DURATION = 2000;
   /**
    * The number of error before the poller is marked as failed.
    */
-  private static final int DEFAULT_ERROR_COUNT_THRESHOLD = 5;
+  public static final int DEFAULT_ERROR_COUNT_THRESHOLD = 5;
 
   public interface Factory
   {
@@ -27,16 +35,17 @@ public abstract class WebPoller
   private final RequestContext _requestContext = new WebPollerRequestContext();
   private WebPollerListener _listener = NullWebPollerListener.INSTANCE;
   private RequestFactory _requestFactory;
-  private boolean _longPoll;
   private boolean _active;
   private boolean _paused;
   private int _errorCount;
-  private int _pollDuration = DEFAULT_POLL_DURATION;
+  private int _interRequestDuration = DEFAULT_INTER_REQUEST_DURATION;
+  private int _interErrorDuration = DEFAULT_INTER_ERROR_DURATION;
   /**
    * The number of errors before the poller is marked as failed.
    */
   private int _errorCountThreshold = DEFAULT_ERROR_COUNT_THRESHOLD;
   private Request _request;
+  private Level _logLevel = Level.OFF;
 
   public static WebPoller newWebPoller()
   {
@@ -65,6 +74,16 @@ public abstract class WebPoller
     }
   }
 
+  public Level getLogLevel()
+  {
+    return _logLevel;
+  }
+
+  public void setLogLevel( final Level logLevel )
+  {
+    _logLevel = logLevel;
+  }
+
   /**
    * @return true if the poller is active.
    */
@@ -74,11 +93,11 @@ public abstract class WebPoller
   }
 
   /**
-   * @return false if stopped, otherwise true if the the last poll resulted in error.
+   * @return true if active and the last poll resulted in error, false otherwise.
    */
   public boolean inError()
   {
-    return _errorCount > 0;
+    return isActive() && _errorCount > 0;
   }
 
   /**
@@ -149,33 +168,32 @@ public abstract class WebPoller
     _errorCountThreshold = errorCountThreshold;
   }
 
-  public final int getPollDuration()
+  public final int getInterRequestDuration()
   {
-    return _pollDuration;
+    return _interRequestDuration;
   }
 
-  public final void setPollDuration( final int pollDuration )
+  public final void setInterRequestDuration( final int interRequestDuration )
   {
     if ( isActive() )
     {
-      throw new IllegalStateException( "Attempt to invoke setPollDuration when poller active" );
+      throw new IllegalStateException( "Attempt to invoke setInterRequestDuration when poller active" );
     }
-    _pollDuration = pollDuration;
+    _interRequestDuration = interRequestDuration;
   }
 
-  public final boolean isLongPoll()
+  public int getInterErrorDuration()
   {
-    return _longPoll;
+    return _interErrorDuration;
   }
 
-  public void setLongPoll( final boolean longPoll )
-    throws IllegalStateException
+  public void setInterErrorDuration( final int interErrorDuration )
   {
     if ( isActive() )
     {
-      throw new IllegalStateException( "Attempt to invoke setLongPoll when poller active" );
+      throw new IllegalStateException( "Attempt to invoke setInterErrorDuration when poller active" );
     }
-    _longPoll = longPoll;
+    _interErrorDuration = interErrorDuration;
   }
 
   public void setListener( @Nullable final WebPollerListener listener )
@@ -235,7 +253,10 @@ public abstract class WebPoller
    */
   protected final void doStop()
   {
-    stopTimer();
+    if ( isTimerActive() )
+    {
+      stopTimer();
+    }
     if ( null != _request )
     {
       _request.cancel();
@@ -253,21 +274,39 @@ public abstract class WebPoller
   protected abstract void stopTimer();
 
   /**
+   * Return true if the timer or the error timer is active.
+   */
+  protected abstract boolean isTimerActive();
+
+  /**
    * Sub-classes should override this method to provide functionality.
    */
   protected final void doStart()
   {
     _active = true;
     onStart();
-    if ( isLongPoll() )
+    initialPoll();
+  }
+
+  private void initialPoll()
+  {
+    if ( 0 >= _interRequestDuration )
     {
       poll();
     }
     else
     {
+      log( "Starting WebPoller timer" );
       startTimer();
     }
   }
+
+  protected abstract void startErrorTimer();
+
+  /**
+   *
+   */
+  protected abstract void stopErrorTimer();
 
   /**
    * Start the timer that triggers the polling.
@@ -287,7 +326,13 @@ public abstract class WebPoller
    */
   private void resetErrorState()
   {
-    _errorCount = 0;
+    if ( 0 != _errorCount )
+    {
+      log( "Resetting WebPoller error state. Stopping error timer." );
+      _errorCount = 0;
+      stopErrorTimer();
+      initialPoll();
+    }
   }
 
   /**
@@ -295,6 +340,7 @@ public abstract class WebPoller
    */
   protected final void onStart()
   {
+    log( "WebPoller start message." );
     _listener.onStart( this );
   }
 
@@ -303,6 +349,7 @@ public abstract class WebPoller
    */
   protected final void onStop()
   {
+    log( "WebPoller stop message." );
     _listener.onStop( this );
   }
 
@@ -312,6 +359,7 @@ public abstract class WebPoller
   protected final void onMessage( @Nonnull final Map<String, String> context,
                                   @Nonnull final String data )
   {
+    log( "WebPoller message received: " + data );
     _listener.onMessage( this, context, data );
     resetErrorState();
   }
@@ -324,9 +372,17 @@ public abstract class WebPoller
   {
     _listener.onError( this, exception );
     _errorCount++;
+    log( "WebPoller error " + _errorCount + "/" + _errorCountThreshold );
     if ( _errorCount > _errorCountThreshold )
     {
+      log( "WebPoller exceeded error threshold " + _errorCountThreshold + ". Stopping WebPoller" );
+      stopErrorTimer();
       doStop();
+    }
+    else if( 1 == _errorCount )
+    {
+      log( "WebPoller starting error timer." );
+      startErrorTimer();
     }
   }
 
@@ -345,7 +401,13 @@ public abstract class WebPoller
   protected void pollReturned()
   {
     _request = null;
-    if ( isActive() && isLongPoll() )
+    /*
+      We immediately poll if we are active and the inter-request duration is 0.
+      However we will not immediately re-issue a poll if in error and the inter-error
+      duration is not 0.
+     */
+    if ( isActive() && 0 >= _interRequestDuration &&
+         ( !inError() || 0 >= _interErrorDuration ) )
     {
       poll();
     }
@@ -368,17 +430,28 @@ public abstract class WebPoller
   }
 
   /**
-   * Sub-classes should override to perform actual polling.
+   * Perform actual polling.
    */
   protected void doPoll()
   {
+    log( "Performing Poll" );
     try
     {
       _request = getRequestFactory().newRequest( getRequestContext() );
+      log( "Poll Scheduled" );
     }
     catch ( final Exception e )
     {
+      log( "Poll Scheduled Error. Starting Error timer." );
       getRequestContext().onError( e );
+    }
+  }
+
+  private void log( final String message )
+  {
+    if ( LOG.isLoggable( getLogLevel() ) )
+    {
+      LOG.log( getLogLevel(), message + " @ " + System.currentTimeMillis() );
     }
   }
 

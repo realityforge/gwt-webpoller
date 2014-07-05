@@ -39,14 +39,6 @@ public abstract class WebPollerListenerAdapter
    * {@inheritDoc}
    */
   @Override
-  public void onEmptyMessage( @Nonnull final WebPoller webPoller )
-  {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void onError( @Nonnull final WebPoller webPoller, @Nonnull final Throwable exception )
   {
   }

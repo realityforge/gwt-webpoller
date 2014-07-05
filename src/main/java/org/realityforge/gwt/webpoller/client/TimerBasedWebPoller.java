@@ -10,6 +10,7 @@ public class TimerBasedWebPoller
   extends WebPoller
 {
   private Timer _timer;
+  private boolean _errorTimer;
 
   public static class Factory
     implements WebPoller.Factory
@@ -25,11 +26,17 @@ public class TimerBasedWebPoller
   @Override
   protected void startTimer()
   {
-    if ( null != _timer )
-    {
-      stopTimer();
-    }
+    doStartTimer( getInterRequestDuration() );
+  }
 
+  protected boolean isTimerActive()
+  {
+    return null != _timer;
+  }
+
+  private void doStartTimer( final int pollDuration )
+  {
+    stopTimer();
     _timer = new Timer()
     {
       @Override
@@ -39,16 +46,33 @@ public class TimerBasedWebPoller
       }
     };
 
-    _timer.scheduleRepeating( getPollDuration() );
+    _timer.scheduleRepeating( pollDuration );
   }
 
   @Override
   protected void stopTimer()
+  {
+    doStopTimer();
+  }
+
+  private void doStopTimer()
   {
     if ( null != _timer )
     {
       _timer.cancel();
       _timer = null;
     }
+  }
+
+  @Override
+  protected void startErrorTimer()
+  {
+    doStartTimer( getInterErrorDuration() );
+  }
+
+  @Override
+  protected void stopErrorTimer()
+  {
+    doStopTimer();
   }
 }

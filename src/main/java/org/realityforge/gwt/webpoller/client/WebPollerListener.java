@@ -21,11 +21,6 @@ public interface WebPollerListener
   void onMessage( @Nonnull WebPoller webPoller, @Nonnull Map<String, String> context, @Nonnull String data );
 
   /**
-   * Invoked after a successful poll returning no data.
-   */
-  void onEmptyMessage( @Nonnull WebPoller webPoller );
-
-  /**
    * Fire an Error event.
    * If the number of successive errors reaches a threshold then shut-down the poller.
    */

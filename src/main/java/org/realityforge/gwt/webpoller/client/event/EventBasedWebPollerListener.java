@@ -69,14 +69,6 @@ public class EventBasedWebPollerListener
    * {@inheritDoc}
    */
   @Override
-  public void onEmptyMessage( @Nonnull final WebPoller webPoller )
-  {
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public final void onMessage( @Nonnull final WebPoller webPoller,
                                @Nonnull final Map<String, String> context,
                                @Nonnull final String data )

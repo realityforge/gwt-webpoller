@@ -1,5 +1,6 @@
 ## 0.7:
 
+* Fix bug in IE handling headers due to GWT parsing null header values.
 * Refactor WebPoller to remove "LongPoll" flag and "PollDuration" configuration. Replace
   concepts with "InterRequestDuration" setting that determines the amount of time between
   one request completing and the next request starting.

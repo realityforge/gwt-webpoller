@@ -44,7 +44,13 @@ public abstract class AbstractHttpRequestFactory
             final HashMap<String, String> context = new HashMap<String, String>();
             for ( final Header header : response.getHeaders() )
             {
-              context.put( header.getName(), header.getValue() );
+              //Under IE response.getHeadersAsString() returns the headers along with the trailing
+              // new lines between http headers and http entity. This means GWT's parsing of headers
+              // places null header in array.
+              if ( null != header )
+              {
+                context.put( header.getName(), header.getValue() );
+              }
             }
             requestContext.onMessage( context, response.getText() );
           }

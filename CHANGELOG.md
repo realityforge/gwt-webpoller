@@ -1,3 +1,7 @@
+## 0.8:
+* Fix the default WebPoller log level to be FINEST rather than OFF which results in
+  the WebPoller logging at the highest log level.
+
 ## 0.7:
 
 * Fix bug in IE handling headers due to GWT parsing null header values.

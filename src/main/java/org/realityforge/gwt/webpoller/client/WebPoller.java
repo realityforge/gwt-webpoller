@@ -45,7 +45,7 @@ public abstract class WebPoller
    */
   private int _errorCountThreshold = DEFAULT_ERROR_COUNT_THRESHOLD;
   private Request _request;
-  private Level _logLevel = Level.OFF;
+  private Level _logLevel = Level.FINEST;
 
   public static WebPoller newWebPoller()
   {

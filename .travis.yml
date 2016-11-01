@@ -1,6 +1,7 @@
 language: ruby
 jdk:
   - oraclejdk7
+sudo: false
 rvm:
   - 1.9.3
 install:

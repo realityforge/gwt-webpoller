@@ -1,3 +1,5 @@
+## 0.9 (Pending):
+
 ## 0.8:
 * Fix the default WebPoller log level to be FINEST rather than OFF which results in
   the WebPoller logging at the highest log level.

@@ -389,7 +389,7 @@ public abstract class WebPoller
       stopErrorTimer();
       doStop();
     }
-    else if( 1 == _errorCount )
+    else if ( 1 == _errorCount )
     {
       log( "WebPoller starting error timer." );
       startErrorTimer();

@@ -1,4 +1,6 @@
 ## 0.9 (Pending):
+* Ensure that the WebPoller can be loaded when the GWT libraries are not present
+  on the classpath.
 
 ## 0.8:
 * Fix the default WebPoller log level to be FINEST rather than OFF which results in

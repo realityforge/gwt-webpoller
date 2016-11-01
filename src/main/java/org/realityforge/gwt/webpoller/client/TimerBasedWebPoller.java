@@ -10,7 +10,6 @@ public class TimerBasedWebPoller
   extends WebPoller
 {
   private Timer _timer;
-  private boolean _errorTimer;
 
   public static class Factory
     implements WebPoller.Factory

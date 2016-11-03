@@ -1,3 +1,9 @@
+## 0.9.1:
+
+* Require explicit registration of WebPoller factory in context of GWT application rather than
+  relying on implicit registration. i.e The following needs to be added before creating poller
+  `WebPoller.register( new TimerBasedWebPoller.Factory() );`
+
 ## 0.9:
 
 * Add server package that supports using WebPoller from within an enterprise java context.

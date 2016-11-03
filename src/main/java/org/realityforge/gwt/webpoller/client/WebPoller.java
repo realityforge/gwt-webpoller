@@ -31,21 +31,6 @@ public abstract class WebPoller
 
   private static Factory g_factory;
 
-  static
-  {
-    try
-    {
-      if ( (Boolean) Class.forName( "com.google.gwt.core.shared.GWT" ).getMethod( "isClient" ).invoke( null ) )
-      {
-        register( new TimerBasedWebPoller.Factory() );
-      }
-    }
-    catch ( final Throwable e )
-    {
-      //Ignored
-    }
-  }
-
   private final RequestContext _requestContext = new WebPollerRequestContext();
   private WebPollerListener _listener = NullWebPollerListener.INSTANCE;
   private RequestFactory _requestFactory;

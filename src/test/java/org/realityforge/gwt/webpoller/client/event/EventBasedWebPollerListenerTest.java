@@ -38,7 +38,7 @@ public class EventBasedWebPollerListenerTest
     {
       final MessageEvent.Handler handler = mock( MessageEvent.Handler.class );
       final HandlerRegistration registration = listener.addMessageHandler( handler );
-      final HashMap<String, String> context = new HashMap<String, String>();
+      final HashMap<String, String> context = new HashMap<>();
       listener.onMessage( webPoller, context, "Blah" );
       final MessageEvent expected = new MessageEvent( webPoller, context, "Blah" );
       verify( handler, only() ).onMessageEvent( refEq( expected, "source" ) );

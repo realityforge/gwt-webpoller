@@ -41,7 +41,7 @@ public abstract class AbstractHttpRequestFactory
           }
           else
           {
-            final HashMap<String, String> context = new HashMap<String, String>();
+            final HashMap<String, String> context = new HashMap<>();
             for ( final Header header : response.getHeaders() )
             {
               //Under IE response.getHeadersAsString() returns the headers along with the trailing

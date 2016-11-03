@@ -244,7 +244,7 @@ public class WebPollerTest
     //Does data flow through
     {
       final String data = "Blah!";
-      final HashMap<String, String> context = new HashMap<String, String>();
+      final HashMap<String, String> context = new HashMap<>();
       webPoller.onMessage( context, data );
       verify( listener, atMost( 1 ) ).onMessage( webPoller, context, data );
     }

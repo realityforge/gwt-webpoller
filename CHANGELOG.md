@@ -1,4 +1,5 @@
 ## 0.9 (Pending):
+* Add server package that supports using WebPoller from within an enterprise java context.
 * Ensure that the WebPoller can be loaded when the GWT libraries are not present
   on the classpath.
 

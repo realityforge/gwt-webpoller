@@ -1,7 +1,7 @@
 <module>
   <source path="client"/>
 
-  <inherits name='com.google.web.bindery.event.Event'/>
+  <inherits name='com.google.gwt.event.EventBase'/>
   <inherits name='com.google.gwt.core.Core'/>
   <inherits name="com.google.gwt.http.HTTP"/>
 </module>

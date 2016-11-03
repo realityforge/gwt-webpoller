@@ -1,9 +1,11 @@
 ## 0.9 (Pending):
+
 * Add server package that supports using WebPoller from within an enterprise java context.
 * Ensure that the WebPoller can be loaded when the GWT libraries are not present
   on the classpath.
 
 ## 0.8:
+
 * Fix the default WebPoller log level to be FINEST rather than OFF which results in
   the WebPoller logging at the highest log level.
 

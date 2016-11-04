@@ -1,3 +1,7 @@
+## 0.9.2:
+
+* Handle `CancellationException` gracefully in `AbstractJaxrsHttpRequestFactory`.
+
 ## 0.9.1:
 
 * Require explicit registration of WebPoller factory in context of GWT application rather than

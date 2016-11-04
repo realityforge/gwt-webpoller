@@ -4,6 +4,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,13 +63,17 @@ public abstract class AbstractJaxrsHttpRequestFactory
         @Override
         public void failed( final Throwable throwable )
         {
-          if ( !( throwable instanceof ProcessingException && throwable.getCause() instanceof SocketTimeoutException ) )
+          if ( throwable instanceof ProcessingException && throwable.getCause() instanceof SocketTimeoutException )
           {
-            requestContext.onError( throwable );
+            requestContext.onEmptyMessage();
+          }
+          else if ( throwable instanceof CancellationException )
+          {
+            requestContext.onEmptyMessage();
           }
           else
           {
-            requestContext.onEmptyMessage();
+            requestContext.onError( throwable );
           }
         }
       } );

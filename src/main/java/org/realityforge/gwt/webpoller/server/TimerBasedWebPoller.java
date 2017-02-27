@@ -3,6 +3,7 @@ package org.realityforge.gwt.webpoller.server;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.realityforge.gwt.webpoller.client.WebPoller;
@@ -17,6 +18,7 @@ public class TimerBasedWebPoller
   private final ScheduledExecutorService _timer;
   @Nullable
   private ScheduledFuture<?> _future;
+  private final ReentrantReadWriteLock _timerLock = new ReentrantReadWriteLock( true );
 
   public static class Factory
     implements WebPoller.Factory
@@ -49,21 +51,38 @@ public class TimerBasedWebPoller
 
   protected boolean isTimerActive()
   {
-    return null != _future;
+    _timerLock.readLock().lock();
+    try
+    {
+      return null != _future;
+    }
+    finally
+    {
+      _timerLock.readLock().unlock();
+    }
   }
 
   private void doStartTimer( final int pollDuration )
   {
-    stopTimer();
-    final Runnable command = new Runnable()
+    _timerLock.writeLock().lock();
+
+    try
     {
-      @Override
-      public void run()
+      stopTimer();
+      final Runnable command = new Runnable()
       {
-        poll();
-      }
-    };
-    _future = _timer.scheduleAtFixedRate( command, 0, pollDuration, TimeUnit.MILLISECONDS );
+        @Override
+        public void run()
+        {
+          poll();
+        }
+      };
+      _future = _timer.scheduleAtFixedRate( command, 0, pollDuration, TimeUnit.MILLISECONDS );
+    }
+    finally
+    {
+      _timerLock.writeLock().unlock();
+    }
   }
 
   @Override
@@ -74,10 +93,18 @@ public class TimerBasedWebPoller
 
   private void doStopTimer()
   {
-    if ( null != _future )
+    _timerLock.writeLock().lock();
+    try
     {
-      _future.cancel( true );
-      _future = null;
+      if ( null != _future )
+      {
+        _future.cancel( true );
+        _future = null;
+      }
+    }
+    finally
+    {
+      _timerLock.writeLock().unlock();
     }
   }
 

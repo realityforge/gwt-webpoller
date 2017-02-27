@@ -1,6 +1,7 @@
 ## 0.9.3 (Pending):
 
 * Move to Java 8 and GWT 2.8.
+* Add a `ReentrantReadWriteLock` around access to timer in `server.TimerBasedWebPoller`.
 
 ## 0.9.2:
 

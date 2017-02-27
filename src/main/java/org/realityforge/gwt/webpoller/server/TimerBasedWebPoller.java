@@ -3,7 +3,9 @@ package org.realityforge.gwt.webpoller.server;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.realityforge.gwt.webpoller.client.WebPoller;
@@ -18,7 +20,7 @@ public class TimerBasedWebPoller
   private final ScheduledExecutorService _timer;
   @Nullable
   private ScheduledFuture<?> _future;
-  private final ReentrantReadWriteLock _timerLock = new ReentrantReadWriteLock( true );
+  private final ReentrantReadWriteLock _lock = new ReentrantReadWriteLock( true );
 
   public static class Factory
     implements WebPoller.Factory
@@ -51,22 +53,12 @@ public class TimerBasedWebPoller
 
   protected boolean isTimerActive()
   {
-    _timerLock.readLock().lock();
-    try
-    {
-      return null != _future;
-    }
-    finally
-    {
-      _timerLock.readLock().unlock();
-    }
+    return withLock( _lock.readLock(), () -> null != _future );
   }
 
   private void doStartTimer( final int pollDuration )
   {
-    _timerLock.writeLock().lock();
-
-    try
+    withLock( _lock.writeLock(), () ->
     {
       stopTimer();
       final Runnable command = new Runnable()
@@ -78,11 +70,7 @@ public class TimerBasedWebPoller
         }
       };
       _future = _timer.scheduleAtFixedRate( command, 0, pollDuration, TimeUnit.MILLISECONDS );
-    }
-    finally
-    {
-      _timerLock.writeLock().unlock();
-    }
+    } );
   }
 
   @Override
@@ -93,19 +81,14 @@ public class TimerBasedWebPoller
 
   private void doStopTimer()
   {
-    _timerLock.writeLock().lock();
-    try
+    withLock( _lock.writeLock(), () ->
     {
       if ( null != _future )
       {
         _future.cancel( true );
         _future = null;
       }
-    }
-    finally
-    {
-      _timerLock.writeLock().unlock();
-    }
+    } );
   }
 
   @Override
@@ -118,5 +101,32 @@ public class TimerBasedWebPoller
   protected void stopErrorTimer()
   {
     doStopTimer();
+  }
+
+  protected <T> T withLock( final Lock lock, final Supplier<T> action )
+  {
+    lock.lock();
+    try
+    {
+      return action.get();
+    }
+    finally
+    {
+      lock.unlock();
+    }
+  }
+
+
+  protected void withLock( final Lock lock, final Runnable action )
+  {
+    lock.lock();
+    try
+    {
+      action.run();
+    }
+    finally
+    {
+      lock.unlock();
+    }
   }
 }

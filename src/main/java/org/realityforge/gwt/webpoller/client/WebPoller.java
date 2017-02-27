@@ -100,7 +100,7 @@ public abstract class WebPoller
    *
    * @throws IllegalStateException if the poller is already active.
    */
-  public final void start()
+  public void start()
     throws IllegalStateException
   {
     if ( isActive() )
@@ -119,7 +119,7 @@ public abstract class WebPoller
    *
    * @throws IllegalStateException if the poller is not active.
    */
-  public final void stop()
+  public void stop()
     throws IllegalStateException
   {
     if ( !isActive() )
@@ -246,7 +246,7 @@ public abstract class WebPoller
   /**
    * Sub-classes should override this method to provide functionality.
    */
-  protected void doStop()
+  protected final void doStop()
   {
     if ( isTimerActive() )
     {
@@ -259,7 +259,7 @@ public abstract class WebPoller
     onStop();
   }
 
-  protected void cancelRequest()
+  private void cancelRequest()
   {
     if ( null != _request )
     {
@@ -324,7 +324,7 @@ public abstract class WebPoller
   /**
    * Invoked after a successful poll, regardless of whether data was received or not.
    */
-  private void resetErrorState()
+  protected void resetErrorState()
   {
     if ( 0 != _errorCount )
     {
@@ -421,7 +421,7 @@ public abstract class WebPoller
   /**
    * Orchestrate the polling.
    */
-  protected final void poll()
+  protected void poll()
   {
     if ( !isInPoll() && !isPaused() )
     {

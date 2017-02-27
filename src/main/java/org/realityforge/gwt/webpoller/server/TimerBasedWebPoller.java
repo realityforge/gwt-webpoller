@@ -95,7 +95,79 @@ public class TimerBasedWebPoller
     doStopTimer();
   }
 
-  protected <T> T withLock( final Lock lock, final Supplier<T> action )
+  @Override
+  public void start()
+  {
+    withLock( _lock.writeLock(), super::start );
+  }
+
+  @Override
+  public void stop()
+  {
+    withLock( _lock.writeLock(), super::stop );
+  }
+
+  @Override
+  public void pause()
+  {
+    withLock( _lock.writeLock(), super::pause );
+  }
+
+  @Override
+  public void resume()
+  {
+    withLock( _lock.writeLock(), super::resume );
+  }
+
+  @Override
+  public boolean isPaused()
+  {
+    return withLock( _lock.readLock(), super::isPaused );
+  }
+
+  @Override
+  public boolean isActive()
+  {
+    return withLock( _lock.readLock(), super::isActive );
+  }
+
+  @Override
+  public boolean inError()
+  {
+    return withLock( _lock.readLock(), super::inError );
+  }
+
+  @Override
+  protected void resetErrorState()
+  {
+    withLock( _lock.writeLock(), () -> super.resetErrorState() );
+  }
+
+  @Override
+  protected void incErrorCount()
+  {
+    withLock( _lock.writeLock(), () -> super.incErrorCount() );
+  }
+
+  @Override
+  protected boolean isInPoll()
+  {
+    return withLock( _lock.readLock(), () -> super.isInPoll() );
+  }
+
+  @Override
+  protected void pollReturned()
+  {
+    withLock( _lock.writeLock(), () -> super.pollReturned() );
+  }
+
+  @Override
+  protected void poll()
+  {
+    withLock( _lock.writeLock(), () -> super.poll() );
+  }
+
+  private <T> T withLock( final Lock lock, final Supplier<T> action )
   {
     lock.lock();
     try
@@ -108,7 +180,7 @@ public class TimerBasedWebPoller
     }
   }
 
-  protected void withLock( final Lock lock, final Runnable action )
+  private void withLock( final Lock lock, final Runnable action )
   {
     lock.lock();
     try

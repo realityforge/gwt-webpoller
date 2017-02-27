@@ -1,7 +1,7 @@
 ## 0.9.3 (Pending):
 
 * Move to Java 8 and GWT 2.8.
-* Add a `ReentrantReadWriteLock` around access to timer in `server.TimerBasedWebPoller`.
+* Add a `ReentrantReadWriteLock` around access to critical resources in `server.TimerBasedWebPoller`.
 * Synchronize access to Request.cancel() method in server mode to avoid doubly canceling futures.
 
 ## 0.9.2:

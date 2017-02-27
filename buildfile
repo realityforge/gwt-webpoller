@@ -6,8 +6,8 @@ require 'buildr/gwt'
 desc 'GWT WebPoller Library'
 define 'gwt-webpoller' do
   project.group = 'org.realityforge.gwt.webpoller'
-  compile.options.source = '1.7'
-  compile.options.target = '1.7'
+  compile.options.source = '1.8'
+  compile.options.target = '1.8'
   compile.options.lint = 'all'
 
   project.version = ENV['PRODUCT_VERSION'] if ENV['PRODUCT_VERSION']
@@ -23,7 +23,7 @@ define 'gwt-webpoller' do
   test.with :mockito
 
   gwt(%w(org.realityforge.gwt.webpoller.WebPoller),
-      :java_args => %w(-Xms512M -Xmx1024M -XX:PermSize=128M -XX:MaxPermSize=256M),
+      :java_args => %w(-Xms512M -Xmx1024M),
       :draft_compile => 'true') unless ENV['GWT_COMPILE'] == 'no'
 
   package(:jar).include("#{_(:source, :main, :java)}/*")

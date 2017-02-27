@@ -61,15 +61,7 @@ public class TimerBasedWebPoller
     withLock( _lock.writeLock(), () ->
     {
       stopTimer();
-      final Runnable command = new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          poll();
-        }
-      };
-      _future = _timer.scheduleAtFixedRate( command, 0, pollDuration, TimeUnit.MILLISECONDS );
+      _future = _timer.scheduleAtFixedRate( this::poll, 0, pollDuration, TimeUnit.MILLISECONDS );
     } );
   }
 

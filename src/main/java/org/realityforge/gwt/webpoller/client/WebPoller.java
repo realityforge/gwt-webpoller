@@ -252,15 +252,20 @@ public abstract class WebPoller
     {
       stopTimer();
     }
+    cancelRequest();
+    _paused = false;
+    _active = false;
+    _errorCount = 0;
+    onStop();
+  }
+
+  protected void cancelRequest()
+  {
     if ( null != _request )
     {
       _request.cancel();
       _request = null;
     }
-    _paused = false;
-    _active = false;
-    _errorCount = 0;
-    onStop();
   }
 
   /**

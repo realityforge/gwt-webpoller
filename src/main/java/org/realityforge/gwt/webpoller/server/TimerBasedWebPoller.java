@@ -108,7 +108,6 @@ public class TimerBasedWebPoller
     }
   }
 
-
   protected void withLock( final Lock lock, final Runnable action )
   {
     lock.lock();

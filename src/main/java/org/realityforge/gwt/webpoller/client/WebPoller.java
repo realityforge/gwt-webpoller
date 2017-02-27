@@ -246,7 +246,7 @@ public abstract class WebPoller
   /**
    * Sub-classes should override this method to provide functionality.
    */
-  protected final void doStop()
+  protected void doStop()
   {
     if ( isTimerActive() )
     {
@@ -384,7 +384,7 @@ public abstract class WebPoller
   /**
    * @return true if a poll request is outstanding.
    */
-  protected final boolean isInPoll()
+  protected boolean isInPoll()
   {
     return null != _request;
   }

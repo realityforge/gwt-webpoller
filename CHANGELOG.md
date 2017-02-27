@@ -1,3 +1,5 @@
+## 0.9.3 (Pending):
+
 ## 0.9.2:
 
 * Handle `CancellationException` gracefully in `AbstractJaxrsHttpRequestFactory`.

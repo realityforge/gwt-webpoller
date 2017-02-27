@@ -371,6 +371,11 @@ public abstract class WebPoller
   protected final void onError( @Nonnull final Throwable exception )
   {
     _listener.onError( this, exception );
+    incErrorCount();
+  }
+
+  protected void incErrorCount()
+  {
     _errorCount++;
     log( "WebPoller error " + _errorCount + "/" + _errorCountThreshold );
     if ( _errorCount > _errorCountThreshold )

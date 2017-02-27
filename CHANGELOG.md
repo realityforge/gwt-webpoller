@@ -1,5 +1,7 @@
 ## 0.9.3 (Pending):
 
+* Move to Java 8 and GWT 2.8.
+
 ## 0.9.2:
 
 * Handle `CancellationException` gracefully in `AbstractJaxrsHttpRequestFactory`.

@@ -1,4 +1,4 @@
-## 0.9.4 (Pending):
+## 0.9.4:
 
 * Introduce CancelableRequestWrapper to support deferred cancel requests.
 

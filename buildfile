@@ -23,7 +23,7 @@ define 'gwt-webpoller' do
 
   gwt(%w(org.realityforge.gwt.webpoller.WebPoller),
       :java_args => %w(-Xms512M -Xmx1024M),
-      :draft_compile => 'true') unless ENV['GWT_COMPILE'] == 'no'
+      :draft_compile => 'true') unless ENV['GWT'] == 'no'
 
   package(:jar).include("#{_(:source, :main, :java)}/*")
   package(:sources)

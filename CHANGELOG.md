@@ -1,5 +1,7 @@
 ## 0.9.4 (Pending):
 
+* Introduce CancelableRequestWrapper to support deferred cancel requests.
+
 ## 0.9.3:
 
 * Move to Java 8 and GWT 2.8.

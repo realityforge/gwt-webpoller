@@ -1,4 +1,4 @@
-## 0.9.5 (Pending):
+## 0.9.5:
 
 * Before calling poll check that WebPoller is active.
 

@@ -1,5 +1,7 @@
 ## 0.9.5 (Pending):
 
+* Before calling poll check that WebPoller is active.
+
 ## 0.9.4:
 
 * Introduce CancelableRequestWrapper to support deferred cancel requests.

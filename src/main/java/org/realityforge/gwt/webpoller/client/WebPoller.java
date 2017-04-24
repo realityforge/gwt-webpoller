@@ -423,7 +423,7 @@ public abstract class WebPoller
    */
   protected void poll()
   {
-    if ( !isInPoll() && !isPaused() )
+    if ( isActive() && !isInPoll() && !isPaused() )
     {
       doPoll();
     }

@@ -13,7 +13,7 @@ install:
 - bundle install
 script: buildr clean package mcrt:publish_if_tagged
 git:
-  depth: 10
+  depth: false
 env:
   global:
   - secure: Z3owvnOSiQVbcnc+qgrIIOcvAR84T4rOT4m7d2mCX/RsD3BKoBMniHdtT3VOTm3kFLqlw4MwfACR1Cf4lsovP5anu+77fAAr1HyxS+ggR01gRFjP8LQZHvRu1o7F8IuX+VUpnVCBFDWfc9tP2KzPMM3DWeFWjedme7kziQqaZMU=

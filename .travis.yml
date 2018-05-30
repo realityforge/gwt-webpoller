@@ -4,6 +4,9 @@ jdk:
 sudo: false
 rvm:
 - 2.3.1
+before_install:
+- openssl aes-256-cbc -K $encrypted_7e4533e2dbcc_key -iv $encrypted_7e4533e2dbcc_iv
+  -in etc/secrets -out ../secrets.tar -d
 install:
 - rvm use 2.3.1
 - gem install bundler
@@ -11,3 +14,8 @@ install:
 script: buildr clean package
 git:
   depth: 10
+env:
+  global:
+  - secure: Z3owvnOSiQVbcnc+qgrIIOcvAR84T4rOT4m7d2mCX/RsD3BKoBMniHdtT3VOTm3kFLqlw4MwfACR1Cf4lsovP5anu+77fAAr1HyxS+ggR01gRFjP8LQZHvRu1o7F8IuX+VUpnVCBFDWfc9tP2KzPMM3DWeFWjedme7kziQqaZMU=
+  - secure: CJujIoKIGYRXf0/b7HF3BmV0ENOOipV5MD6J4Rv77h7DxuAVZ3fRtr9bpcEwiWV0cvsFHrJ3ut+YmGBfNHbaz473Xt+IQoxhsIT7qhszObtLw9e9SlprXMOd2niQQq3Us/J8PjuWkEHtWYnh9Gjj/L9IKITHkUM8d0lixv6WhPg=
+  - secure: hJlIO4H5yigOSeFxCvVoR2HpXaDLiCcwrJi5FufbWvaOUp0E94bx3LYwMReNUwMAh+5vIYWKgcjabcsjyEJnwjinMlKhLZYMM/bs0YEweq2m6YJDoyPLDz4CNPanFBP0F4uRtMT2ItLbutDGCx+6O6PsXCEC8T5zmj1bT6Jxuk4=

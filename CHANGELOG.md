@@ -1,3 +1,7 @@
+## 0.9.6:
+
+* Introduce the `CancelableRequestFactory` support class.
+
 ## 0.9.5:
 
 * Before calling poll check that WebPoller is active.

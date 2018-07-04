@@ -14,14 +14,22 @@ import javax.annotation.Nullable;
 public abstract class AbstractHttpRequestFactory
   implements RequestFactory
 {
+  @Nullable
   protected abstract RequestBuilder getRequestBuilder();
 
-  @Nonnull
+  /**
+   * {@inheritDoc}
+   */
+  @Nullable
   @Override
   public Request newRequest( @Nonnull final RequestContext requestContext )
     throws Exception
   {
     final RequestBuilder requestBuilder = getRequestBuilder();
+    if( null == requestBuilder )
+    {
+      return null;
+    }
     requestBuilder.setCallback( new RequestCallback()
     {
       @Override

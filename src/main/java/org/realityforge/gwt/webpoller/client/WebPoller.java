@@ -443,7 +443,10 @@ public abstract class WebPoller
     try
     {
       _request = getRequestFactory().newRequest( getRequestContext() );
-      log( "Poll Scheduled" );
+      if ( null != _request )
+      {
+        log( "Poll Scheduled" );
+      }
     }
     catch ( final Exception e )
     {

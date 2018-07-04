@@ -1,12 +1,14 @@
 package org.realityforge.gwt.webpoller.client;
 
+import javax.annotation.Nullable;
+
 public final class CancelableRequestWrapper
   implements Request
 {
   private Request _request;
   private boolean _cancelled;
 
-  public void setRequest( final Request request )
+  public void setRequest( @Nullable final Request request )
   {
     _request = request;
     if ( _cancelled )

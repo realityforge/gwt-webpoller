@@ -1,3 +1,8 @@
+## 0.9.7:
+
+* Update the `RequestFactory.newRequest(...)` method so that it can return null. When null is returned
+  the WebPoller skips that poll attempt.
+
 ## 0.9.6:
 
 * Introduce the `CancelableRequestFactory` support class.

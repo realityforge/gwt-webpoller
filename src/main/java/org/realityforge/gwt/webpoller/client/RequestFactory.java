@@ -1,6 +1,7 @@
 package org.realityforge.gwt.webpoller.client;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * The interface by which the poller created requests.
@@ -15,7 +16,7 @@ public interface RequestFactory
    * @return the new request.
    * @throws Exception if there is an error creating request.
    */
-  @Nonnull
+  @Nullable
   Request newRequest( @Nonnull RequestContext context )
     throws Exception;
 }

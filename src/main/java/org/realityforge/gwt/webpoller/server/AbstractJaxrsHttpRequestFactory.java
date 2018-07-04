@@ -22,16 +22,24 @@ import org.realityforge.gwt.webpoller.client.RequestFactory;
 public abstract class AbstractJaxrsHttpRequestFactory
   implements RequestFactory
 {
-  @Nonnull
+  @Nullable
   protected abstract Invocation.Builder getInvocation();
 
-  @Nonnull
+  /**
+   * {@inheritDoc}
+   */
+  @Nullable
   @Override
   public Request newRequest( @Nonnull final RequestContext requestContext )
     throws Exception
   {
+    final Invocation.Builder builder = getInvocation();
+    if( null == builder )
+    {
+      return null;
+    }
     final Future<Response> future =
-      getInvocation().async().get( new InvocationCallback<Response>()
+      builder.async().get( new InvocationCallback<Response>()
       {
         @Override
         public void completed( final Response response )

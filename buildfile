@@ -21,11 +21,9 @@ define 'gwt-webpoller' do
   test.using :testng
   test.with :mockito
 
-  gwt(%w(org.realityforge.gwt.webpoller.WebPoller),
-      :java_args => %w(-Xms512M -Xmx1024M),
-      :draft_compile => 'true') unless ENV['GWT'] == 'no'
-
   package(:jar).include("#{_(:source, :main, :java)}/*")
   package(:sources)
   package(:javadoc)
+
+  gwt_enhance(project)
 end

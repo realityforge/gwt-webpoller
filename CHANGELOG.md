@@ -1,3 +1,7 @@
+## 0.9.8:
+
+* Compile GWT modules as part of build process to ensure that the `.gwt.xml` file is consistent.
+
 ## 0.9.7:
 
 * Update the `RequestFactory.newRequest(...)` method so that it can return null. When null is returned

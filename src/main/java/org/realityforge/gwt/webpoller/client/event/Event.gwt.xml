@@ -2,5 +2,5 @@
   <inherits name='org.realityforge.gwt.webpoller.WebPoller'/>
   <inherits name='com.google.gwt.event.EventBase'/>
 
-  <source path='' includes='*.java'/>
+  <source path=''/>
 </module>

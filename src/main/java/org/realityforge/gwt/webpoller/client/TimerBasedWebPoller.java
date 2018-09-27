@@ -1,6 +1,6 @@
 package org.realityforge.gwt.webpoller.client;
 
-import com.google.gwt.user.client.Timer;
+import elemental2.dom.DomGlobal;
 import javax.annotation.Nonnull;
 
 /**
@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class TimerBasedWebPoller
   extends WebPoller
 {
-  private Timer _timer;
+  private double _intervalTimerId;
 
   public static class Factory
     implements WebPoller.Factory
@@ -30,22 +30,13 @@ public class TimerBasedWebPoller
 
   protected boolean isTimerActive()
   {
-    return null != _timer;
+    return 0 != _intervalTimerId;
   }
 
   private void doStartTimer( final int pollDuration )
   {
     stopTimer();
-    _timer = new Timer()
-    {
-      @Override
-      public void run()
-      {
-        poll();
-      }
-    };
-
-    _timer.scheduleRepeating( pollDuration );
+    _intervalTimerId = DomGlobal.setInterval( t -> poll(), pollDuration );
   }
 
   @Override
@@ -56,10 +47,10 @@ public class TimerBasedWebPoller
 
   private void doStopTimer()
   {
-    if ( null != _timer )
+    if ( 0 != _intervalTimerId )
     {
-      _timer.cancel();
-      _timer = null;
+      DomGlobal.clearInterval( _intervalTimerId );
+      _intervalTimerId = 0;
     }
   }
 

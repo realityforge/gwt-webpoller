@@ -16,7 +16,13 @@ define 'gwt-webpoller' do
   pom.add_developer('realityforge', 'Peter Donald')
   pom.provided_dependencies.concat [:javax_annotation, :gwt_user, :javaee]
 
-  compile.with :javax_annotation, :gwt_user, :javaee
+  compile.with :jsinterop_base,
+               :elemental2_core,
+               :elemental2_dom,
+               :elemental2_promise,
+               :javax_annotation,
+               :gwt_user,
+               :javaee
 
   test.using :testng
   test.with :mockito

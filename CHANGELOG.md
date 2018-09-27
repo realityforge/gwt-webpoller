@@ -8,6 +8,7 @@
   only need to compile gwts http library if it is actually used.
 * Rename gwt module `org.realityforge.gwt.webpoller.WebPoller` to `org.realityforge.gwt.webpoller.client.WebPoller`
   for the sake of consistency.
+* Replace dependency upon GWT's `Timer` object with the raw `setInterval()` API provided by the browser.
 
 ## 0.9.7:
 

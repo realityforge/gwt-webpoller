@@ -1,5 +1,5 @@
 <module>
-  <inherits name='org.realityforge.gwt.webpoller.WebPoller'/>
+  <inherits name='org.realityforge.gwt.webpoller.client.WebPoller'/>
   <inherits name='com.google.gwt.http.HTTP'/>
 
   <source path=''/>

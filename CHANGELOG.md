@@ -6,6 +6,8 @@
 * Migrate `AbstractHttpRequestFactory` and `HttpRequestFactory` classes into the package
   `org.realityforge.gwt.webpoller.client.http` and create a new gwt module so that downstream users
   only need to compile gwts http library if it is actually used.
+* Rename gwt module `org.realityforge.gwt.webpoller.WebPoller` to `org.realityforge.gwt.webpoller.client.WebPoller`
+  for the sake of consistency.
 
 ## 0.9.7:
 

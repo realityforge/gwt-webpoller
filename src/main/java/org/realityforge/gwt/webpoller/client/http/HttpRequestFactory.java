@@ -1,7 +1,8 @@
-package org.realityforge.gwt.webpoller.client;
+package org.realityforge.gwt.webpoller.client.http;
 
 import com.google.gwt.http.client.RequestBuilder;
 import javax.annotation.Nonnull;
+import org.realityforge.gwt.webpoller.client.RequestFactory;
 
 /**
  * A request factory that uses the standard GWT HTTP module.

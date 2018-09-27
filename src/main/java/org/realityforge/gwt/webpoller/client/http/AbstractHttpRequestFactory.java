@@ -1,4 +1,4 @@
-package org.realityforge.gwt.webpoller.client;
+package org.realityforge.gwt.webpoller.client.http;
 
 import com.google.gwt.http.client.Header;
 import com.google.gwt.http.client.RequestBuilder;
@@ -7,6 +7,9 @@ import com.google.gwt.http.client.Response;
 import java.util.HashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.realityforge.gwt.webpoller.client.Request;
+import org.realityforge.gwt.webpoller.client.RequestContext;
+import org.realityforge.gwt.webpoller.client.RequestFactory;
 
 /**
  * An request factory that uses the standard GWT HTTP module.
@@ -26,7 +29,7 @@ public abstract class AbstractHttpRequestFactory
     throws Exception
   {
     final RequestBuilder requestBuilder = getRequestBuilder();
-    if( null == requestBuilder )
+    if ( null == requestBuilder )
     {
       return null;
     }

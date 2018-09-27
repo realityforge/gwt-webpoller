@@ -1,6 +1,8 @@
 ## 0.9.8:
 
 * Compile GWT modules as part of build process to ensure that the `.gwt.xml` file is consistent.
+* Split gwt modules into `WebPoller.gwt.xml` and `Event.gwt.xml` so that downstream users need not
+  compile.
 
 ## 0.9.7:
 

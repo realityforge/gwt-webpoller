@@ -1,6 +1,6 @@
 # gwt-webpoller
 
-[![Build Status](https://secure.travis-ci.org/realityforge/gwt-webpoller.png?branch=master)](http://travis-ci.org/realityforge/gwt-webpoller)
+[![Build Status](https://secure.travis-ci.org/realityforge/gwt-webpoller.svg?branch=master)](http://travis-ci.org/realityforge/gwt-webpoller)
 [<img src="https://img.shields.io/maven-central/v/org.realityforge.gwt.webpoller/gwt-webpoller.svg?label=latest%20release"/>](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.realityforge.gwt.webpoller%22%20a%3A%22gwt-webpoller%22)
 
 A simple library to provide a simple web poller for GWT.

@@ -1,3 +1,7 @@
+## Unreleased
+
+* Remove deployment from TravisCI infrastructure as it is no longer feasible.
+
 ## 0.9.8:
 
 * Compile GWT modules as part of build process to ensure that the `.gwt.xml` file is consistent.

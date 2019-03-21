@@ -1,3 +1,10 @@
+# Deprecated
+
+> This project has been deprecated. There is nothing wrong with the library but it is no
+> longer being used now that WebSocket support is well supported on the web platform.
+
+---
+
 # gwt-webpoller
 
 [![Build Status](https://secure.travis-ci.org/realityforge/gwt-webpoller.svg?branch=master)](http://travis-ci.org/realityforge/gwt-webpoller)
